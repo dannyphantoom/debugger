@@ -2,14 +2,16 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QTextCursor>
 #include <QtWidgets/QScrollBar>
+#include <QtGui/QTextCursor>
 #include <QtCore/QRegularExpression>
 #include <QtGui/QTextCharFormat>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QContextMenuEvent>
+#include <QtGui/QClipboard>
+#include <QtGui/QTextBlock>
 
 namespace debugger {
 
@@ -38,7 +40,9 @@ DisassemblyView::DisassemblyView(QWidget* parent)
     
     // Connect signals for line number updates
     connect(this, &QTextEdit::textChanged, this, &DisassemblyView::update_line_number_area_width);
-    connect(verticalScrollBar(), &QScrollBar::valueChanged, line_number_area, &LineNumberArea::update);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, [this]() {
+        line_number_area->update();
+    });
     connect(this, &QTextEdit::cursorPositionChanged, this, &DisassemblyView::highlight_current_line);
     
     update_line_number_area_width();
@@ -320,7 +324,7 @@ void DisassemblyView::update_line_number_area_width() {
 
 int DisassemblyView::line_number_area_width() {
     int digits = 1;
-    int max_line = qMax(1, blockCount());
+    int max_line = qMax(1, document()->blockCount());
     while (max_line >= 10) {
         max_line /= 10;
         ++digits;
@@ -334,23 +338,18 @@ void DisassemblyView::line_number_area_paint_event(QPaintEvent* event) {
     QPainter painter(line_number_area);
     painter.fillRect(event->rect(), QColor(240, 240, 240));
     
-    QTextBlock block = firstVisibleBlock();
-    int block_number = block.blockNumber();
-    int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
-    int bottom = top + qRound(blockBoundingRect(block).height());
+    // Simple line number painting - just draw numbers based on visible area
+    int line_height = fontMetrics().height();
+    int lines_in_view = event->rect().height() / line_height;
     
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(block_number + 1);
+    for (int i = 0; i < lines_in_view + 1; ++i) {
+        int y = i * line_height;
+        if (y >= event->rect().top() && y <= event->rect().bottom()) {
+            QString number = QString::number(i + 1);
             painter.setPen(Qt::black);
-            painter.drawText(0, top, line_number_area->width(), 
-                           fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(0, y, line_number_area->width(), 
+                           line_height, Qt::AlignRight, number);
         }
-        
-        block = block.next();
-        top = bottom;
-        bottom = top + qRound(blockBoundingRect(block).height());
-        ++block_number;
     }
 }
 

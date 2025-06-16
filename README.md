@@ -2,16 +2,21 @@
 
 A comprehensive GUI-based debugger with disassembly, decompilation, and debugging capabilities for Linux systems.
 
+![Advanced Debugger](https://img.shields.io/badge/platform-Linux-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![C++](https://img.shields.io/badge/language-C++-blue.svg)
+![Qt5](https://img.shields.io/badge/GUI-Qt5-green.svg)
+
 ## Features
 
-### 🔧 Core Capabilities
+### 🔧 **Core Capabilities**
 - **Multi-Architecture Disassembler**: Support for x86, x86-64, and ARM architectures
 - **Intelligent Decompiler**: Convert assembly code back to readable C-like pseudocode
 - **Advanced Debugging**: Set breakpoints, step through code, and inspect memory/registers
 - **ELF Binary Analysis**: Parse and analyze ELF executables and shared libraries
 - **Symbol Table Management**: Automatic symbol resolution and function identification
 
-### 🖥️ GUI Features
+### 🖥️ **GUI Features**
 - **Disassembly View**: Interactive assembly code viewer with syntax highlighting
 - **Decompiler View**: Side-by-side assembly and decompiled C code
 - **Memory Browser**: Hexadecimal memory viewer with annotations
@@ -19,7 +24,7 @@ A comprehensive GUI-based debugger with disassembly, decompilation, and debuggin
 - **Breakpoint Manager**: Visual breakpoint management and control
 - **Project Management**: Save and load debugging sessions
 
-### 🛠️ Technical Features
+### 🛠️ **Technical Features**
 - **Process Control**: Full process control using ptrace API
 - **Memory Management**: Advanced memory mapping and protection analysis
 - **Symbol Resolution**: Automatic function and variable name resolution
@@ -52,252 +57,286 @@ A comprehensive GUI-based debugger with disassembly, decompilation, and debuggin
 - 🔄 Cross-reference analysis
 - 🔄 Project save/load functionality
 
-## Architecture
+## Quick Installation
 
-```
-debugger/
-├── src/
-│   ├── main.cpp                    # Application entry point
-│   ├── core/                       # Core functionality
-│   │   ├── project.cpp             # Project management
-│   │   ├── symbol_table.cpp        # Symbol resolution
-│   │   └── utils.cpp               # Utility functions
-│   ├── disassembler/               # Disassembly engine
-│   │   ├── disassembler.cpp        # Main disassembler
-│   │   ├── elf_parser.cpp          # ELF file parsing
-│   │   └── architecture.cpp        # Architecture-specific code
-│   ├── decompiler/                 # Decompilation engine
-│   │   ├── decompiler.cpp          # Main decompiler
-│   │   ├── pattern_matcher.cpp     # Code pattern recognition
-│   │   └── ast_builder.cpp         # Abstract Syntax Tree builder
-│   ├── debugger/                   # Debug engine
-│   │   ├── debugger.cpp            # Main debugger controller
-│   │   ├── breakpoint.cpp          # Breakpoint management
-│   │   ├── memory_manager.cpp      # Memory operations
-│   │   └── process_control.cpp     # Process control via ptrace
-│   └── gui/                        # GUI components
-│       ├── main_window.cpp         # Main application window
-│       ├── disassembly_view.cpp    # Assembly code viewer
-│       ├── decompiler_view.cpp     # Decompiled code viewer
-│       ├── debugger_view.cpp       # Debug control panel
-│       ├── memory_view.cpp         # Memory browser
-│       └── registers_view.cpp      # Register inspector
-├── include/                        # Header files
-└── build/                          # Build directory
-```
+### Automatic Installation (Recommended)
 
-## Dependencies
+The easiest way to install the Advanced Debugger is using the provided installer script:
 
-### Required Libraries
-- **Qt5**: GUI framework
-- **Capstone Engine**: Multi-architecture disassembler
-- **ELFIO**: ELF file parsing library
-- **CMake**: Build system (3.16+)
-- **GCC/Clang**: C++17 compatible compiler
-
-### Ubuntu/Debian Installation
 ```bash
-sudo apt update
-sudo apt install -y \
-    build-essential \
-    cmake \
-    qt5-default \
-    qttools5-dev-tools \
-    libcapstone-dev \
-    libelfio-dev \
-    pkg-config
+# Clone the repository
+git clone <repository-url>
+cd debugger
+
+# Run the installer (it will handle everything automatically)
+chmod +x install.sh
+./install.sh
 ```
 
-### Fedora/RHEL Installation
+The installer will:
+1. **Detect your Linux distribution** automatically
+2. **Install all required dependencies**
+3. **Build the project** using CMake
+4. **Run basic tests** to verify functionality
+5. **Optionally install system-wide** with desktop integration
+
+### Supported Distributions
+
+The installer supports the following Linux distributions:
+
+- **Arch Linux** (and derivatives: Manjaro, EndeavourOS)
+- **Ubuntu** (and derivatives: Pop!_OS, Elementary, Zorin)
+- **Debian** (and derivatives)
+- **Fedora** (and derivatives: CentOS, RHEL, Rocky, AlmaLinux)
+- **openSUSE** (Leap, Tumbleweed, SLED, SLES)
+
+### Manual Installation
+
+If you prefer to install manually or your distribution isn't supported:
+
+#### Dependencies
+
+**Build Tools:**
+- C++ compiler (GCC 7+ or Clang 5+)
+- CMake 3.16+
+- Make or Ninja
+- pkg-config
+
+**Libraries:**
+- Qt5 (Core, Widgets, Tools)
+- Capstone disassembly engine
+- Git (for cloning)
+
+#### Installation Commands
+
+**Arch Linux:**
 ```bash
-sudo dnf install -y \
-    gcc-c++ \
-    cmake \
-    qt5-qtbase-devel \
-    qt5-qttools-devel \
-    capstone-devel \
-    elfio-devel \
-    pkgconfig
+sudo pacman -S base-devel cmake qt5-base qt5-tools capstone git
 ```
 
-### Arch Linux Installation
+**Ubuntu/Debian:**
 ```bash
-sudo pacman -S \
-    base-devel \
-    cmake \
-    qt5-base \
-    qt5-tools \
-    capstone \
-    elfio
+sudo apt install build-essential cmake qtbase5-dev qttools5-dev libcapstone-dev git
 ```
 
-## Building
-
-### Quick Build
+**Fedora:**
 ```bash
-# Clone and navigate to project directory
-cd /path/to/debugger
+sudo dnf install gcc-c++ cmake qt5-qtbase-devel qt5-qttools-devel capstone-devel git
+```
 
-# Create build directory
+#### Build Process
+
+```bash
+# Clone and build
+git clone <repository-url>
+cd debugger
 mkdir build && cd build
-
-# Configure with CMake
-cmake ..
-
-# Build the project
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 
-# Install (optional)
-sudo make install
-```
-
-### Development Build with Debug Symbols
-```bash
-mkdir build-debug && cd build-debug
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-```
-
-### Release Build (Optimized)
-```bash
-mkdir build-release && cd build-release
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
-```
-
-## Usage
-
-### Basic Usage
-```bash
-# Launch the debugger
+# Run the debugger
 ./debugger
-
-# Or debug a specific binary
-./debugger /path/to/binary
 ```
 
-### Command Line Options
-```bash
-./debugger [OPTIONS] [BINARY]
+## Usage Guide
 
-Options:
-  -h, --help              Show help message
-  -v, --version           Show version information
-  -a, --arch ARCH         Force architecture (x86, x64, arm)
-  --no-gui                Run in command-line mode
-  --symbols FILE          Load external symbol file
-```
+### Getting Started
+
+1. **Launch the debugger:**
+   ```bash
+   advanced-debugger  # If installed system-wide
+   # OR
+   ./build/debugger   # If built locally
+   ```
+
+2. **Load a binary:**
+   - Click `File` → `Open Binary...`
+   - Select your executable file
+   - The debugger will automatically analyze and disassemble it
+
+3. **Start debugging:**
+   - Click `Debug` → `Start Debugging (F5)`
+   - Or use the toolbar button
+
+### Key Features
+
+#### Disassembly View
+- **Color-coded instructions**: Calls (red), jumps (orange), addresses (green)
+- **Line numbers** for easy navigation
+- **Double-click addresses** to navigate
+- **Context menu** for copy/navigation options
+
+#### Memory View
+- **Hex editor interface** with 16-byte rows
+- **Color-coded bytes**: Null (gray), printable (green), 0xFF (red)
+- **Interactive editing** with validation
+- **Go-to-address** functionality
+
+#### Registers View
+- **Complete x86-64 register set** display
+- **Visual change tracking** with highlighting
+- **Flags register decoding** (CF, PF, ZF, SF, etc.)
+- **Context menu** for copying and navigation
+
+#### Breakpoint Management
+- **Toggle breakpoints** with F9 or context menu
+- **Conditional breakpoints** with custom expressions
+- **Breakpoint list** with enable/disable options
+- **Hit count tracking**
 
 ### Keyboard Shortcuts
-- **F5**: Start/Continue debugging
-- **F9**: Toggle breakpoint at current line
-- **F10**: Step over
-- **F11**: Step into
-- **Shift+F11**: Step out
-- **Ctrl+G**: Go to address
-- **Ctrl+F**: Find/Search
-- **Ctrl+S**: Save project
 
-## Features in Detail
+| Action | Shortcut |
+|--------|----------|
+| Open Binary | Ctrl+O |
+| Start/Continue Debug | F5 |
+| Step Into | F11 |
+| Step Over | F10 |
+| Toggle Breakpoint | F9 |
+| Go to Address | Ctrl+G |
+| Find | Ctrl+F |
+| Close | Ctrl+W |
+| Exit | Ctrl+Q |
 
-### Disassembler
-- Support for x86, x86-64, and ARM instruction sets
-- Intelligent function detection and boundary analysis
-- Cross-reference generation for jumps and calls
-- Import/export table analysis
-- String and constant identification
+### Example Workflow
 
-### Decompiler
-- Pattern-based decompilation to C-like pseudocode
-- Control flow reconstruction (if/else, loops, switch)
-- Variable type inference
-- Function signature reconstruction
-- Comment generation for unclear operations
+1. **Open a binary** you want to analyze
+2. **Review the disassembly** to understand the code flow
+3. **Set breakpoints** at interesting locations
+4. **Start debugging** to examine runtime behavior
+5. **Step through code** and monitor register/memory changes
+6. **Analyze functions** using the decompiler view
+7. **Save your session** for later analysis
 
-### Debugger
-- Full process control (start, stop, step, continue)
-- Hardware and software breakpoints
-- Memory and register inspection/modification
-- Stack trace analysis
-- Thread management
-- Conditional breakpoints
+## Advanced Features
 
-## Development
+### Project Files
+Save your analysis progress with project files that include:
+- Breakpoint locations and conditions
+- Analysis comments and labels
+- Function definitions and names
+- Session metadata and timestamps
 
-### Adding New Architectures
-1. Extend `Architecture` class in `src/disassembler/architecture.cpp`
-2. Add architecture-specific patterns in `src/decompiler/pattern_matcher.cpp`
-3. Update CMakeLists.txt if new dependencies are required
+### String Analysis
+Extract and analyze strings from:
+- Code sections
+- Data sections (.rodata, .data, .bss)
+- With automatic filtering and categorization
 
-### Contributing
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Import/Export Analysis
+- **Import table** analysis with library information
+- **Export table** examination for shared libraries
+- **Symbol resolution** and cross-referencing
 
-### Coding Standards
-- Follow C++17 standards
-- Use Qt naming conventions for GUI code
-- Document public APIs with Doxygen comments
-- Include unit tests for new functionality
+### Memory Debugging
+- **Memory breakpoints** for read/write access
+- **Memory pattern search** and comparison
+- **Memory dump** and export functionality
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Capstone not found**
+**Q: The application crashes on startup**
+A: Make sure all dependencies are installed. Run the installer again or check dependency versions.
+
+**Q: Can't attach to process**
+A: You may need elevated privileges. Try running with `sudo` or check your system's ptrace settings.
+
+**Q: Missing symbols in disassembly**
+A: Ensure the binary wasn't stripped. Try loading additional symbol files if available.
+
+**Q: Qt5 not found during build**
+A: Install the Qt5 development packages for your distribution (see installation section).
+
+### Debug Information
+
+For debugging issues:
+1. Check the log view in the application
+2. Run from terminal to see console output
+3. Verify all dependencies with `ldd ./build/debugger`
+
+### Uninstalling
+
+If you installed system-wide, an uninstaller script is created:
 ```bash
-# Ensure Capstone is installed
-sudo apt install libcapstone-dev  # Ubuntu/Debian
-sudo dnf install capstone-devel   # Fedora
+./uninstall.sh
 ```
 
-**Qt5 not found**
+Or manually remove:
 ```bash
-# Install Qt5 development packages
-sudo apt install qt5-default qttools5-dev-tools
+sudo rm /usr/local/bin/advanced-debugger
+rm ~/.local/share/applications/advanced-debugger.desktop
 ```
 
-**Permission denied during debugging**
-```bash
-# Add user to required groups or run with elevated privileges
-sudo setcap cap_sys_ptrace=eip ./debugger
+## Architecture
+
+### Core Components
+
+- **Disassembler**: Capstone-based multi-architecture disassembly
+- **Decompiler**: Pattern-matching decompilation engine
+- **Debugger Engine**: ptrace-based process debugging
+- **ELF Parser**: Custom ELF file format analyzer
+- **GUI Framework**: Qt5-based modern interface
+
+### Directory Structure
+
+```
+debugger/
+├── src/
+│   ├── core/           # Core functionality
+│   ├── debugger/       # Debugging engine
+│   ├── decompiler/     # Decompilation engine
+│   ├── disassembler/   # Disassembly engine
+│   └── gui/            # User interface
+├── include/            # Header files
+├── build/              # Build directory
+├── install.sh          # Installation script
+├── uninstall.sh        # Uninstaller (generated)
+└── README.md           # This file
 ```
 
-### Debug Mode
-Enable verbose logging by setting environment variables:
+## Development
+
+### Building for Development
+
 ```bash
-export DEBUGGER_LOG_LEVEL=DEBUG
-export DEBUGGER_LOG_FILE=debugger.log
-./debugger
+# Debug build with symbols
+mkdir build-debug && cd build-debug
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+make -j$(nproc)
 ```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+### Coding Standards
+
+- C++17 standard
+- Qt5 conventions for GUI code
+- Clear variable names and comments
+- Error handling for all operations
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-- **Capstone Engine**: For providing excellent disassembly capabilities
-- **Qt Framework**: For the robust GUI framework
-- **ELFIO**: For ELF file parsing functionality
-- **Linux Community**: For ptrace API documentation and examples
+- **Capstone Engine** for disassembly capabilities
+- **Qt Framework** for the GUI framework
+- **ELF specification** for binary format support
+- **Linux ptrace** for debugging functionality
 
-## Roadmap
+## Contact
 
-### Version 1.1 (Upcoming)
-- [ ] Plugin system for custom analysis modules
-- [ ] Scripting interface (Python bindings)
-- [ ] Advanced anti-debugging detection
-- [ ] Remote debugging capabilities
-
-### Version 1.2 (Future)
-- [ ] Windows PE file support
-- [ ] MacOS Mach-O file support
-- [ ] RISC-V architecture support
-- [ ] Machine learning-based decompilation improvements
+For issues, questions, or contributions, please use the project's issue tracker or contact the maintainers.
 
 ---
 
-For more information, documentation, and updates, visit the project repository. 
+**Advanced Debugger** - Professional reverse engineering and debugging for Linux 

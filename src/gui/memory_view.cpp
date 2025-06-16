@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QFont>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QClipboard>
 #include <QtCore/QStringList>
 
 namespace debugger {

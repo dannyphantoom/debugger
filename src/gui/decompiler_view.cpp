@@ -6,6 +6,8 @@
 #include <QtGui/QTextCharFormat>
 #include <QtGui/QSyntaxHighlighter>
 #include <QtGui/QTextDocument>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QClipboard>
 
 namespace debugger {
 
@@ -30,7 +32,7 @@ private:
         HighlightingRule rule;
 
         // Keywords
-        keyword_format.setColor(QColor(86, 156, 214));
+        keyword_format.setForeground(QColor(86, 156, 214));
         keyword_format.setFontWeight(QFont::Bold);
         QStringList keywords;
         keywords << "\\bint\\b" << "\\bchar\\b" << "\\bshort\\b" << "\\blong\\b"
@@ -46,26 +48,26 @@ private:
         }
 
         // Function calls
-        function_format.setColor(QColor(220, 220, 170));
+        function_format.setForeground(QColor(220, 220, 170));
         function_format.setFontWeight(QFont::Bold);
         rule.pattern = QRegularExpression("\\b[A-Za-z_][A-Za-z0-9_]*(?=\\()");
         rule.format = function_format;
         highlighting_rules.append(rule);
 
         // Numbers
-        number_format.setColor(QColor(181, 206, 168));
+        number_format.setForeground(QColor(181, 206, 168));
         rule.pattern = QRegularExpression("\\b0[xX][0-9A-Fa-f]+\\b|\\b\\d+\\b");
         rule.format = number_format;
         highlighting_rules.append(rule);
 
         // Strings
-        string_format.setColor(QColor(214, 157, 133));
+        string_format.setForeground(QColor(214, 157, 133));
         rule.pattern = QRegularExpression("\".*\"");
         rule.format = string_format;
         highlighting_rules.append(rule);
 
         // Comments
-        comment_format.setColor(QColor(106, 153, 85));
+        comment_format.setForeground(QColor(106, 153, 85));
         comment_format.setFontItalic(true);
         rule.pattern = QRegularExpression("//[^\n]*");
         rule.format = comment_format;
@@ -77,7 +79,7 @@ private:
         highlighting_rules.append(rule);
 
         // Variable names
-        variable_format.setColor(QColor(156, 220, 254));
+        variable_format.setForeground(QColor(156, 220, 254));
         rule.pattern = QRegularExpression("\\b[a-z_][a-z0-9_]*\\b");
         rule.format = variable_format;
         highlighting_rules.append(rule);
@@ -155,12 +157,12 @@ void DecompilerView::contextMenuEvent(QContextMenuEvent* event) {
     
     menu->addSeparator();
     
-    QAction* analyze_function = menu.addAction("Analyze Current Function");
+    QAction* analyze_function = menu->addAction("Analyze Current Function");
     connect(analyze_function, &QAction::triggered, [this] {
         emit function_analysis_requested();
     });
     
-    QAction* goto_assembly = menu.addAction("Go to Assembly");
+    QAction* goto_assembly = menu->addAction("Go to Assembly");
     connect(goto_assembly, &QAction::triggered, [this] {
         emit goto_assembly_requested();
     });

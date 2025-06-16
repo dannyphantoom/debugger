@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <ctime>
 #include <iomanip>
+#include <algorithm>
 
 namespace debugger {
 

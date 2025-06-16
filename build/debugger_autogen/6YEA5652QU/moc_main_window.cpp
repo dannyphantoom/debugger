@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'main_window.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.17)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +13,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'main_window.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.15.13. It"
+#error "This file was generated using the moc from 5.15.17. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_debugger__DisassemblyView_t {
-    QByteArrayData data[1];
-    char stringdata0[26];
+    QByteArrayData data[9];
+    char stringdata0[172];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,10 +32,23 @@ struct qt_meta_stringdata_debugger__DisassemblyView_t {
     )
 static const qt_meta_stringdata_debugger__DisassemblyView_t qt_meta_stringdata_debugger__DisassemblyView = {
     {
-QT_MOC_LITERAL(0, 0, 25) // "debugger::DisassemblyView"
+QT_MOC_LITERAL(0, 0, 25), // "debugger::DisassemblyView"
+QT_MOC_LITERAL(1, 26, 22), // "address_double_clicked"
+QT_MOC_LITERAL(2, 49, 0), // ""
+QT_MOC_LITERAL(3, 50, 8), // "uint64_t"
+QT_MOC_LITERAL(4, 59, 7), // "address"
+QT_MOC_LITERAL(5, 67, 27), // "toggle_breakpoint_requested"
+QT_MOC_LITERAL(6, 95, 23), // "go_to_address_requested"
+QT_MOC_LITERAL(7, 119, 29), // "update_line_number_area_width"
+QT_MOC_LITERAL(8, 149, 22) // "highlight_current_line"
 
     },
-    "debugger::DisassemblyView"
+    "debugger::DisassemblyView\0"
+    "address_double_clicked\0\0uint64_t\0"
+    "address\0toggle_breakpoint_requested\0"
+    "go_to_address_requested\0"
+    "update_line_number_area_width\0"
+    "highlight_current_line"
 };
 #undef QT_MOC_LITERAL
 
@@ -45,22 +58,71 @@ static const uint qt_meta_data_debugger__DisassemblyView[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       3,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   39,    2, 0x06 /* Public */,
+       5,    1,   42,    2, 0x06 /* Public */,
+       6,    0,   45,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+       7,    0,   46,    2, 0x08 /* Private */,
+       8,    0,   47,    2, 0x08 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void,
+
+ // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
 
 void debugger::DisassemblyView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<DisassemblyView *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->address_double_clicked((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 1: _t->toggle_breakpoint_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 2: _t->go_to_address_requested(); break;
+        case 3: _t->update_line_number_area_width(); break;
+        case 4: _t->highlight_current_line(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (DisassemblyView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DisassemblyView::address_double_clicked)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (DisassemblyView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DisassemblyView::toggle_breakpoint_requested)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (DisassemblyView::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DisassemblyView::go_to_address_requested)) {
+                *result = 2;
+                return;
+            }
+        }
+    }
 }
 
 QT_INIT_METAOBJECT const QMetaObject debugger::DisassemblyView::staticMetaObject = { {
@@ -89,11 +151,42 @@ void *debugger::DisassemblyView::qt_metacast(const char *_clname)
 int debugger::DisassemblyView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QTextEdit::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 5)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 5;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 5)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 5;
+    }
     return _id;
 }
+
+// SIGNAL 0
+void debugger::DisassemblyView::address_double_clicked(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void debugger::DisassemblyView::toggle_breakpoint_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void debugger::DisassemblyView::go_to_address_requested()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
+}
 struct qt_meta_stringdata_debugger__DecompilerView_t {
-    QByteArrayData data[1];
-    char stringdata0[25];
+    QByteArrayData data[4];
+    char stringdata0[78];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -102,10 +195,15 @@ struct qt_meta_stringdata_debugger__DecompilerView_t {
     )
 static const qt_meta_stringdata_debugger__DecompilerView_t qt_meta_stringdata_debugger__DecompilerView = {
     {
-QT_MOC_LITERAL(0, 0, 24) // "debugger::DecompilerView"
+QT_MOC_LITERAL(0, 0, 24), // "debugger::DecompilerView"
+QT_MOC_LITERAL(1, 25, 27), // "function_analysis_requested"
+QT_MOC_LITERAL(2, 53, 0), // ""
+QT_MOC_LITERAL(3, 54, 23) // "goto_assembly_requested"
 
     },
-    "debugger::DecompilerView"
+    "debugger::DecompilerView\0"
+    "function_analysis_requested\0\0"
+    "goto_assembly_requested"
 };
 #undef QT_MOC_LITERAL
 
@@ -115,21 +213,51 @@ static const uint qt_meta_data_debugger__DecompilerView[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       2,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    0,   24,    2, 0x06 /* Public */,
+       3,    0,   25,    2, 0x06 /* Public */,
+
+ // signals: parameters
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
 
 void debugger::DecompilerView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<DecompilerView *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->function_analysis_requested(); break;
+        case 1: _t->goto_assembly_requested(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (DecompilerView::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DecompilerView::function_analysis_requested)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (DecompilerView::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DecompilerView::goto_assembly_requested)) {
+                *result = 1;
+                return;
+            }
+        }
+    }
     (void)_a;
 }
 
@@ -159,11 +287,34 @@ void *debugger::DecompilerView::qt_metacast(const char *_clname)
 int debugger::DecompilerView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QTextEdit::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
     return _id;
 }
+
+// SIGNAL 0
+void debugger::DecompilerView::function_analysis_requested()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+
+// SIGNAL 1
+void debugger::DecompilerView::goto_assembly_requested()
+{
+    QMetaObject::activate(this, &staticMetaObject, 1, nullptr);
+}
 struct qt_meta_stringdata_debugger__MemoryView_t {
-    QByteArrayData data[1];
-    char stringdata0[21];
+    QByteArrayData data[15];
+    char stringdata0[191];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -172,10 +323,28 @@ struct qt_meta_stringdata_debugger__MemoryView_t {
     )
 static const qt_meta_stringdata_debugger__MemoryView_t qt_meta_stringdata_debugger__MemoryView = {
     {
-QT_MOC_LITERAL(0, 0, 20) // "debugger::MemoryView"
+QT_MOC_LITERAL(0, 0, 20), // "debugger::MemoryView"
+QT_MOC_LITERAL(1, 21, 24), // "memory_refresh_requested"
+QT_MOC_LITERAL(2, 46, 0), // ""
+QT_MOC_LITERAL(3, 47, 8), // "uint64_t"
+QT_MOC_LITERAL(4, 56, 7), // "address"
+QT_MOC_LITERAL(5, 64, 6), // "size_t"
+QT_MOC_LITERAL(6, 71, 4), // "size"
+QT_MOC_LITERAL(7, 76, 22), // "memory_write_requested"
+QT_MOC_LITERAL(8, 99, 7), // "uint8_t"
+QT_MOC_LITERAL(9, 107, 5), // "value"
+QT_MOC_LITERAL(10, 113, 20), // "breakpoint_requested"
+QT_MOC_LITERAL(11, 134, 15), // "on_item_changed"
+QT_MOC_LITERAL(12, 150, 17), // "QTableWidgetItem*"
+QT_MOC_LITERAL(13, 168, 4), // "item"
+QT_MOC_LITERAL(14, 173, 17) // "show_go_to_dialog"
 
     },
-    "debugger::MemoryView"
+    "debugger::MemoryView\0memory_refresh_requested\0"
+    "\0uint64_t\0address\0size_t\0size\0"
+    "memory_write_requested\0uint8_t\0value\0"
+    "breakpoint_requested\0on_item_changed\0"
+    "QTableWidgetItem*\0item\0show_go_to_dialog"
 };
 #undef QT_MOC_LITERAL
 
@@ -185,22 +354,71 @@ static const uint qt_meta_data_debugger__MemoryView[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       3,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    2,   39,    2, 0x06 /* Public */,
+       7,    2,   44,    2, 0x06 /* Public */,
+      10,    1,   49,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+      11,    1,   52,    2, 0x08 /* Private */,
+      14,    0,   55,    2, 0x08 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 5,    4,    6,
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 8,    4,    9,
+    QMetaType::Void, 0x80000000 | 3,    4,
+
+ // slots: parameters
+    QMetaType::Void, 0x80000000 | 12,   13,
+    QMetaType::Void,
 
        0        // eod
 };
 
 void debugger::MemoryView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<MemoryView *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->memory_refresh_requested((*reinterpret_cast< uint64_t(*)>(_a[1])),(*reinterpret_cast< size_t(*)>(_a[2]))); break;
+        case 1: _t->memory_write_requested((*reinterpret_cast< uint64_t(*)>(_a[1])),(*reinterpret_cast< uint8_t(*)>(_a[2]))); break;
+        case 2: _t->breakpoint_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 3: _t->on_item_changed((*reinterpret_cast< QTableWidgetItem*(*)>(_a[1]))); break;
+        case 4: _t->show_go_to_dialog(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (MemoryView::*)(uint64_t , size_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MemoryView::memory_refresh_requested)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (MemoryView::*)(uint64_t , uint8_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MemoryView::memory_write_requested)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (MemoryView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MemoryView::breakpoint_requested)) {
+                *result = 2;
+                return;
+            }
+        }
+    }
 }
 
 QT_INIT_METAOBJECT const QMetaObject debugger::MemoryView::staticMetaObject = { {
@@ -229,11 +447,43 @@ void *debugger::MemoryView::qt_metacast(const char *_clname)
 int debugger::MemoryView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QTableWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 5)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 5;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 5)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 5;
+    }
     return _id;
 }
+
+// SIGNAL 0
+void debugger::MemoryView::memory_refresh_requested(uint64_t _t1, size_t _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void debugger::MemoryView::memory_write_requested(uint64_t _t1, uint8_t _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void debugger::MemoryView::breakpoint_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
 struct qt_meta_stringdata_debugger__RegistersView_t {
-    QByteArrayData data[1];
-    char stringdata0[24];
+    QByteArrayData data[6];
+    char stringdata0[94];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -242,10 +492,17 @@ struct qt_meta_stringdata_debugger__RegistersView_t {
     )
 static const qt_meta_stringdata_debugger__RegistersView_t qt_meta_stringdata_debugger__RegistersView = {
     {
-QT_MOC_LITERAL(0, 0, 23) // "debugger::RegistersView"
+QT_MOC_LITERAL(0, 0, 23), // "debugger::RegistersView"
+QT_MOC_LITERAL(1, 24, 29), // "navigate_to_address_requested"
+QT_MOC_LITERAL(2, 54, 0), // ""
+QT_MOC_LITERAL(3, 55, 8), // "uint64_t"
+QT_MOC_LITERAL(4, 64, 7), // "address"
+QT_MOC_LITERAL(5, 72, 21) // "view_memory_requested"
 
     },
-    "debugger::RegistersView"
+    "debugger::RegistersView\0"
+    "navigate_to_address_requested\0\0uint64_t\0"
+    "address\0view_memory_requested"
 };
 #undef QT_MOC_LITERAL
 
@@ -255,22 +512,51 @@ static const uint qt_meta_data_debugger__RegistersView[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       2,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   24,    2, 0x06 /* Public */,
+       5,    1,   27,    2, 0x06 /* Public */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3,    4,
 
        0        // eod
 };
 
 void debugger::RegistersView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<RegistersView *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->navigate_to_address_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 1: _t->view_memory_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (RegistersView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&RegistersView::navigate_to_address_requested)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (RegistersView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&RegistersView::view_memory_requested)) {
+                *result = 1;
+                return;
+            }
+        }
+    }
 }
 
 QT_INIT_METAOBJECT const QMetaObject debugger::RegistersView::staticMetaObject = { {
@@ -299,11 +585,36 @@ void *debugger::RegistersView::qt_metacast(const char *_clname)
 int debugger::RegistersView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QTableWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
     return _id;
 }
+
+// SIGNAL 0
+void debugger::RegistersView::navigate_to_address_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void debugger::RegistersView::view_memory_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
 struct qt_meta_stringdata_debugger__BreakpointView_t {
-    QByteArrayData data[1];
-    char stringdata0[25];
+    QByteArrayData data[7];
+    char stringdata0[129];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -312,10 +623,19 @@ struct qt_meta_stringdata_debugger__BreakpointView_t {
     )
 static const qt_meta_stringdata_debugger__BreakpointView_t qt_meta_stringdata_debugger__BreakpointView = {
     {
-QT_MOC_LITERAL(0, 0, 24) // "debugger::BreakpointView"
+QT_MOC_LITERAL(0, 0, 24), // "debugger::BreakpointView"
+QT_MOC_LITERAL(1, 25, 27), // "breakpoint_toggle_requested"
+QT_MOC_LITERAL(2, 53, 0), // ""
+QT_MOC_LITERAL(3, 54, 8), // "uint64_t"
+QT_MOC_LITERAL(4, 63, 7), // "address"
+QT_MOC_LITERAL(5, 71, 27), // "breakpoint_remove_requested"
+QT_MOC_LITERAL(6, 99, 29) // "navigate_to_address_requested"
 
     },
-    "debugger::BreakpointView"
+    "debugger::BreakpointView\0"
+    "breakpoint_toggle_requested\0\0uint64_t\0"
+    "address\0breakpoint_remove_requested\0"
+    "navigate_to_address_requested"
 };
 #undef QT_MOC_LITERAL
 
@@ -325,22 +645,61 @@ static const uint qt_meta_data_debugger__BreakpointView[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       3,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   29,    2, 0x06 /* Public */,
+       5,    1,   32,    2, 0x06 /* Public */,
+       6,    1,   35,    2, 0x06 /* Public */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3,    4,
 
        0        // eod
 };
 
 void debugger::BreakpointView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<BreakpointView *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->breakpoint_toggle_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 1: _t->breakpoint_remove_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        case 2: _t->navigate_to_address_requested((*reinterpret_cast< uint64_t(*)>(_a[1]))); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (BreakpointView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&BreakpointView::breakpoint_toggle_requested)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (BreakpointView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&BreakpointView::breakpoint_remove_requested)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (BreakpointView::*)(uint64_t );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&BreakpointView::navigate_to_address_requested)) {
+                *result = 2;
+                return;
+            }
+        }
+    }
 }
 
 QT_INIT_METAOBJECT const QMetaObject debugger::BreakpointView::staticMetaObject = { {
@@ -369,7 +728,39 @@ void *debugger::BreakpointView::qt_metacast(const char *_clname)
 int debugger::BreakpointView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QTableWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 3)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 3;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 3)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 3;
+    }
     return _id;
+}
+
+// SIGNAL 0
+void debugger::BreakpointView::breakpoint_toggle_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void debugger::BreakpointView::breakpoint_remove_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void debugger::BreakpointView::navigate_to_address_requested(uint64_t _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 struct qt_meta_stringdata_debugger__MainWindow_t {
     QByteArrayData data[28];

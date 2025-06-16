@@ -1,7 +1,12 @@
 #include "main_window.h"
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableWidgetItem>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 #include <QtGui/QFont>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QClipboard>
 #include <QtCore/QVariant>
 
 namespace debugger {
@@ -233,6 +238,180 @@ void RegistersView::contextMenuEvent(QContextMenuEvent* event) {
     // Add modify register action (for future implementation)
     QAction* modify = menu.addAction("Modify Register...");
     modify->setEnabled(false); // TODO: Implement register modification
+    
+    menu.exec(event->globalPos());
+}
+
+// Helper function to convert BreakpointType enum to string
+QString breakpoint_type_to_string(BreakpointType type) {
+    switch (type) {
+        case BreakpointType::SOFTWARE:
+            return "Software";
+        case BreakpointType::HARDWARE:
+            return "Hardware";
+        case BreakpointType::CONDITIONAL:
+            return "Conditional";
+        default:
+            return "Unknown";
+    }
+}
+
+// BreakpointView implementation
+BreakpointView::BreakpointView(QWidget* parent) : QTableWidget(parent) {
+    setup_table();
+    setup_columns();
+}
+
+void BreakpointView::setup_table() {
+    setColumnCount(4);
+    setHorizontalHeaderLabels({"Address", "Type", "Enabled", "Condition"});
+    setAlternatingRowColors(true);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+    
+    // Set font to monospace for consistent formatting
+    QFont mono_font("Consolas", 10);
+    mono_font.setStyleHint(QFont::Monospace);
+    setFont(mono_font);
+    
+    // Configure headers
+    horizontalHeader()->setStretchLastSection(true);
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    
+    verticalHeader()->setVisible(false);
+}
+
+void BreakpointView::setup_columns() {
+    setColumnCount(4);
+    setHorizontalHeaderLabels({"Address", "Type", "Enabled", "Condition"});
+}
+
+void BreakpointView::set_breakpoints(const std::vector<Breakpoint>& breakpoints) {
+    current_breakpoints = breakpoints;
+    
+    // Clear existing items
+    setRowCount(0);
+    
+    if (breakpoints.empty()) {
+        return;
+    }
+    
+    setRowCount(breakpoints.size());
+    
+    for (size_t i = 0; i < breakpoints.size(); ++i) {
+        const auto& bp = breakpoints[i];
+        
+        // Address
+        QTableWidgetItem* addr_item = new QTableWidgetItem(
+            QString("0x%1").arg(bp.address, 16, 16, QChar('0')).toUpper()
+        );
+        addr_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        setItem(i, 0, addr_item);
+        
+        // Type
+        QTableWidgetItem* type_item = new QTableWidgetItem(breakpoint_type_to_string(bp.type));
+        type_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        setItem(i, 1, type_item);
+        
+        // Enabled
+        QTableWidgetItem* enabled_item = new QTableWidgetItem(bp.enabled ? "Yes" : "No");
+        enabled_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        if (bp.enabled) {
+            enabled_item->setForeground(QColor(0, 128, 0)); // Green for enabled
+        } else {
+            enabled_item->setForeground(QColor(128, 128, 128)); // Gray for disabled
+        }
+        setItem(i, 2, enabled_item);
+        
+        // Condition
+        QTableWidgetItem* condition_item = new QTableWidgetItem(QString::fromStdString(bp.condition));
+        condition_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        setItem(i, 3, condition_item);
+        
+        // Add tooltip with full information
+        QString tooltip = QString("Breakpoint at 0x%1\nType: %2\nEnabled: %3\nHit count: %4")
+                         .arg(bp.address, 16, 16, QChar('0'))
+                         .arg(breakpoint_type_to_string(bp.type))
+                         .arg(bp.enabled ? "Yes" : "No")
+                         .arg(bp.hit_count);
+        
+        if (!bp.condition.empty()) {
+            tooltip += QString("\nCondition: %1").arg(QString::fromStdString(bp.condition));
+        }
+        
+        addr_item->setToolTip(tooltip);
+    }
+    
+    resizeColumnsToContents();
+}
+
+void BreakpointView::add_breakpoint(const Breakpoint& bp) {
+    current_breakpoints.push_back(bp);
+    set_breakpoints(current_breakpoints);
+}
+
+void BreakpointView::remove_breakpoint(uint64_t address) {
+    current_breakpoints.erase(
+        std::remove_if(current_breakpoints.begin(), current_breakpoints.end(),
+                      [address](const Breakpoint& bp) {
+                          return bp.address == address;
+                      }),
+        current_breakpoints.end());
+    set_breakpoints(current_breakpoints);
+}
+
+void BreakpointView::update_breakpoint_list() {
+    // Refresh the current display
+    set_breakpoints(current_breakpoints);
+}
+
+void BreakpointView::contextMenuEvent(QContextMenuEvent* event) {
+    QTableWidgetItem* item = itemAt(event->pos());
+    if (!item) {
+        return;
+    }
+    
+    int row = item->row();
+    if (row < 0 || row >= static_cast<int>(current_breakpoints.size())) {
+        return;
+    }
+    
+    const Breakpoint& bp = current_breakpoints[row];
+    
+    QMenu menu(this);
+    
+    // Copy address
+    QAction* copy_address = menu.addAction(QString("Copy Address (0x%1)")
+                                         .arg(bp.address, 16, 16, QChar('0')).toUpper());
+    connect(copy_address, &QAction::triggered, [bp]() {
+        QApplication::clipboard()->setText(QString("0x%1").arg(bp.address, 16, 16, QChar('0')).toUpper());
+    });
+    
+    menu.addSeparator();
+    
+    // Enable/Disable breakpoint
+    QString enable_text = bp.enabled ? "Disable Breakpoint" : "Enable Breakpoint";
+    QAction* toggle_enabled = menu.addAction(enable_text);
+    connect(toggle_enabled, &QAction::triggered, [this, bp]() {
+        emit breakpoint_toggle_requested(bp.address);
+    });
+    
+    // Remove breakpoint
+    QAction* remove_bp = menu.addAction("Remove Breakpoint");
+    connect(remove_bp, &QAction::triggered, [this, bp]() {
+        emit breakpoint_remove_requested(bp.address);
+    });
+    
+    menu.addSeparator();
+    
+    // Go to address
+    QAction* goto_address = menu.addAction("Go to Address");
+    connect(goto_address, &QAction::triggered, [this, bp]() {
+        emit navigate_to_address_requested(bp.address);
+    });
     
     menu.exec(event->globalPos());
 }

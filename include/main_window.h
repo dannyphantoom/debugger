@@ -191,7 +191,16 @@ public:
     void setup_columns();
     void update_breakpoint_list();
 
+signals:
+    void breakpoint_toggle_requested(uint64_t address);
+    void breakpoint_remove_requested(uint64_t address);
+    void navigate_to_address_requested(uint64_t address);
+
+protected:
+    void contextMenuEvent(QContextMenuEvent* event) override;
+
 private:
+    void setup_table();
     std::vector<Breakpoint> current_breakpoints;
 };
 
