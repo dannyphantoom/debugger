@@ -12,6 +12,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QDialog>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QSettings>
@@ -306,6 +308,37 @@ void MainWindow::setup_center_panel(QSplitter* parent) {
 }
 
 void MainWindow::setup_right_panel(QSplitter* parent) {
+    QWidget* right_widget = new QWidget();
+    QVBoxLayout* right_layout = new QVBoxLayout(right_widget);
+    right_layout->setContentsMargins(5, 5, 5, 5);
+    
+    // Debug control buttons
+    QWidget* debug_controls = new QWidget();
+    QHBoxLayout* controls_layout = new QHBoxLayout(debug_controls);
+    controls_layout->setContentsMargins(0, 0, 0, 0);
+    
+    continue_button = new QPushButton("Continue");
+    pause_button = new QPushButton("Pause");
+    step_into_button = new QPushButton("Step Into");
+    step_over_button = new QPushButton("Step Over");
+    step_out_button = new QPushButton("Step Out");
+    
+    continue_button->setToolTip("Continue execution (F5)");
+    pause_button->setToolTip("Pause execution");
+    step_into_button->setToolTip("Step into function (F11)");
+    step_over_button->setToolTip("Step over instruction (F10)");
+    step_out_button->setToolTip("Step out of function");
+    
+    controls_layout->addWidget(continue_button);
+    controls_layout->addWidget(pause_button);
+    controls_layout->addSeparator();
+    controls_layout->addWidget(step_into_button);
+    controls_layout->addWidget(step_over_button);
+    controls_layout->addWidget(step_out_button);
+    controls_layout->addStretch();
+    
+    right_layout->addWidget(debug_controls);
+    
     QTabWidget* right_tabs = new QTabWidget();
     
     // Registers view
@@ -323,10 +356,10 @@ void MainWindow::setup_right_panel(QSplitter* parent) {
     // Log view
     log_view = new QTextEdit();
     log_view->setReadOnly(true);
-    // Note: QTextEdit doesn't have setMaximumBlockCount, this was a mistake
     right_tabs->addTab(log_view, "Log");
     
-    parent->addWidget(right_tabs);
+    right_layout->addWidget(right_tabs);
+    parent->addWidget(right_widget);
 }
 
 void MainWindow::setup_menus() {
@@ -405,10 +438,35 @@ void MainWindow::connect_signals() {
     
     // Connect tree widget signals
     connect(functions_tree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem* item) {
-        bool ok;
-        uint64_t address = item->text(1).toULongLong(&ok, 16);
-        if (ok) {
-            navigate_to_address(address);
+        // Try to get address from tooltip or item data
+        QString tooltip = item->toolTip(0);
+        if (tooltip.contains("Address:")) {
+            QString address_str = tooltip.split("Address: ")[1].split(",")[0];
+            if (address_str.startsWith("0x")) {
+                address_str.remove(0, 2);
+            }
+            
+            bool ok;
+            uint64_t address = address_str.toULongLong(&ok, 16);
+            if (ok) {
+                navigate_to_address(address);
+            }
+        }
+    });
+    
+    connect(symbols_tree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem* item) {
+        QString tooltip = item->toolTip(0);
+        if (tooltip.contains("Address:")) {
+            QString address_str = tooltip.split("Address: ")[1].split(")")[0];
+            if (address_str.startsWith("0x")) {
+                address_str.remove(0, 2);
+            }
+            
+            bool ok;
+            uint64_t address = address_str.toULongLong(&ok, 16);
+            if (ok) {
+                navigate_to_address(address);
+            }
         }
     });
 }
@@ -539,19 +597,101 @@ void MainWindow::on_action_start_debug_triggered() {
 }
 
 void MainWindow::on_action_attach_process_triggered() {
-    log_message("Attach to process requested (not implemented yet)");
+    bool ok;
+    QString pid_text = QInputDialog::getText(this, "Attach to Process", 
+                                           "Enter Process ID (PID):", 
+                                           QLineEdit::Normal, "", &ok);
+    
+    if (ok && !pid_text.isEmpty()) {
+        pid_t pid = pid_text.toInt(&ok);
+        if (ok && pid > 0) {
+            log_message(QString("Attempting to attach to process %1...").arg(pid));
+            
+            if (debugger_engine->attach_to_process(pid)) {
+                current_debug_state = DebuggerState::PAUSED;
+                debug_state_label->setText("Attached");
+                update_debug_controls();
+                log_message(QString("Successfully attached to process %1").arg(pid));
+                QMessageBox::information(this, "Process Attached", 
+                                       QString("Successfully attached to process %1").arg(pid));
+            } else {
+                log_message("ERROR: Failed to attach to process");
+                QMessageBox::critical(this, "Attach Error", 
+                                    "Failed to attach to process: " + 
+                                    QString::fromStdString(debugger_engine->get_last_error()));
+            }
+        } else {
+            QMessageBox::warning(this, "Invalid PID", "Please enter a valid process ID.");
+        }
+    }
 }
 
 void MainWindow::on_action_continue_triggered() {
-    log_message("Continue execution requested (not implemented yet)");
+    if (current_debug_state != DebuggerState::PAUSED) {
+        QMessageBox::warning(this, "Not Paused", "Process is not paused. Start debugging first.");
+        return;
+    }
+    
+    log_message("Continuing execution...");
+    if (debugger_engine->continue_execution()) {
+        current_debug_state = DebuggerState::RUNNING;
+        debug_state_label->setText("Running");
+        update_debug_controls();
+        log_message("Execution continued");
+    } else {
+        log_message("ERROR: Failed to continue execution");
+        QMessageBox::critical(this, "Continue Error", 
+                            "Failed to continue execution: " + 
+                            QString::fromStdString(debugger_engine->get_last_error()));
+    }
 }
 
 void MainWindow::on_action_pause_triggered() {
-    log_message("Pause execution requested (not implemented yet)");
+    if (current_debug_state != DebuggerState::RUNNING) {
+        QMessageBox::warning(this, "Not Running", "Process is not running.");
+        return;
+    }
+    
+    log_message("Pausing execution...");
+    if (debugger_engine->pause_execution()) {
+        current_debug_state = DebuggerState::PAUSED;
+        debug_state_label->setText("Paused");
+        update_debug_controls();
+        refresh_views();
+        log_message("Execution paused");
+    } else {
+        log_message("ERROR: Failed to pause execution");
+        QMessageBox::critical(this, "Pause Error", 
+                            "Failed to pause execution: " + 
+                            QString::fromStdString(debugger_engine->get_last_error()));
+    }
 }
 
 void MainWindow::on_action_stop_triggered() {
-    log_message("Stop execution requested (not implemented yet)");
+    if (current_debug_state == DebuggerState::NOT_RUNNING) {
+        QMessageBox::information(this, "Not Running", "No debug session is active.");
+        return;
+    }
+    
+    if (confirm_action("Are you sure you want to stop the debug session?")) {
+        log_message("Stopping debug session...");
+        if (debugger_engine->stop_execution()) {
+            current_debug_state = DebuggerState::NOT_RUNNING;
+            debug_state_label->setText("Stopped");
+            update_debug_controls();
+            
+            // Clear debug-specific views
+            registers_view->set_registers({});
+            memory_view->set_memory_data(0, {});
+            
+            log_message("Debug session stopped");
+        } else {
+            log_message("ERROR: Failed to stop execution");
+            QMessageBox::critical(this, "Stop Error", 
+                                "Failed to stop execution: " + 
+                                QString::fromStdString(debugger_engine->get_last_error()));
+        }
+    }
 }
 
 void MainWindow::on_action_step_into_triggered() {
@@ -563,7 +703,11 @@ void MainWindow::on_action_step_into_triggered() {
     log_message("Stepping into...");
     if (debugger_engine->step_into()) {
         log_message("Step completed");
-        // Update register and memory views here
+        refresh_views();
+        
+        // Update current address
+        current_address = debugger_engine->get_instruction_pointer();
+        highlight_current_instruction(current_address);
     } else {
         log_message("ERROR: Step failed");
         QMessageBox::warning(this, "Step Error", "Failed to step: " + QString::fromStdString(debugger_engine->get_last_error()));
@@ -579,6 +723,11 @@ void MainWindow::on_action_step_over_triggered() {
     log_message("Stepping over...");
     if (debugger_engine->step_over()) {
         log_message("Step over completed");
+        refresh_views();
+        
+        // Update current address
+        current_address = debugger_engine->get_instruction_pointer();
+        highlight_current_instruction(current_address);
     } else {
         log_message("ERROR: Step over failed");
         QMessageBox::warning(this, "Step Error", "Failed to step over: " + QString::fromStdString(debugger_engine->get_last_error()));
@@ -586,19 +735,165 @@ void MainWindow::on_action_step_over_triggered() {
 }
 
 void MainWindow::on_action_step_out_triggered() {
-    log_message("Step out requested (not implemented yet)");
+    if (current_debug_state != DebuggerState::PAUSED) {
+        QMessageBox::warning(this, "Not Debugging", "No active debug session. Start debugging first.");
+        return;
+    }
+    
+    log_message("Stepping out of function...");
+    if (debugger_engine->step_out()) {
+        log_message("Step out completed");
+        refresh_views();
+        
+        // Update current address
+        current_address = debugger_engine->get_instruction_pointer();
+        highlight_current_instruction(current_address);
+    } else {
+        log_message("ERROR: Step out failed");
+        QMessageBox::warning(this, "Step Error", 
+                           "Failed to step out: " + 
+                           QString::fromStdString(debugger_engine->get_last_error()));
+    }
 }
 
 void MainWindow::on_action_go_to_address_triggered() {
-    log_message("Go to address requested (not implemented yet)");
+    bool ok;
+    QString address_text = QInputDialog::getText(this, "Go to Address", 
+                                               "Enter address (hex format, e.g., 0x401000):", 
+                                               QLineEdit::Normal, "", &ok);
+    
+    if (ok && !address_text.isEmpty()) {
+        // Remove 0x prefix if present
+        QString clean_address = address_text;
+        if (clean_address.startsWith("0x", Qt::CaseInsensitive)) {
+            clean_address.remove(0, 2);
+        }
+        
+        uint64_t address = clean_address.toULongLong(&ok, 16);
+        if (ok) {
+            log_message(QString("Navigating to address 0x%1").arg(address, 0, 16));
+            navigate_to_address(address);
+            
+            // If debugging, also try to read memory at that address
+            if (current_debug_state == DebuggerState::PAUSED) {
+                std::vector<uint8_t> memory = debugger_engine->read_memory(address, 256);
+                if (!memory.empty()) {
+                    memory_view->set_memory_data(address, memory);
+                }
+            }
+        } else {
+            QMessageBox::warning(this, "Invalid Address", 
+                               "Please enter a valid hexadecimal address (e.g., 0x401000 or 401000).");
+        }
+    }
 }
 
 void MainWindow::on_action_find_triggered() {
-    log_message("Find requested (not implemented yet)");
+    bool ok;
+    QString search_text = QInputDialog::getText(this, "Find", 
+                                              "Enter text to search for:", 
+                                              QLineEdit::Normal, "", &ok);
+    
+    if (ok && !search_text.isEmpty()) {
+        log_message(QString("Searching for: %1").arg(search_text));
+        
+        // Get the current active tab/view and search in it
+        QTabWidget* center_tabs = dynamic_cast<QTabWidget*>(disassembly_view->parent());
+        if (center_tabs) {
+            int current_tab = center_tabs->currentIndex();
+            
+            if (current_tab == 0) { // Disassembly view
+                QTextDocument* doc = disassembly_view->document();
+                QTextCursor cursor = doc->find(search_text, disassembly_view->textCursor());
+                
+                if (!cursor.isNull()) {
+                    disassembly_view->setTextCursor(cursor);
+                    disassembly_view->ensureCursorVisible();
+                    log_message("Found text in disassembly view");
+                } else {
+                    QMessageBox::information(this, "Find", "Text not found in disassembly view.");
+                    log_message("Text not found in disassembly view");
+                }
+            } else if (current_tab == 1) { // Decompiler view
+                QTextDocument* doc = decompiler_view->document();
+                QTextCursor cursor = doc->find(search_text, decompiler_view->textCursor());
+                
+                if (!cursor.isNull()) {
+                    decompiler_view->setTextCursor(cursor);
+                    decompiler_view->ensureCursorVisible();
+                    log_message("Found text in decompiler view");
+                } else {
+                    QMessageBox::information(this, "Find", "Text not found in decompiler view.");
+                    log_message("Text not found in decompiler view");
+                }
+            }
+        }
+    }
 }
 
 void MainWindow::on_action_toggle_breakpoint_triggered() {
-    log_message("Toggle breakpoint requested (not implemented yet)");
+    // Use current address if available, otherwise ask user for address
+    uint64_t address = current_address;
+    
+    if (address == 0) {
+        bool ok;
+        QString address_text = QInputDialog::getText(this, "Toggle Breakpoint", 
+                                                   "Enter address for breakpoint (hex format):", 
+                                                   QLineEdit::Normal, "", &ok);
+        
+        if (!ok || address_text.isEmpty()) {
+            return;
+        }
+        
+        QString clean_address = address_text;
+        if (clean_address.startsWith("0x", Qt::CaseInsensitive)) {
+            clean_address.remove(0, 2);
+        }
+        
+        address = clean_address.toULongLong(&ok, 16);
+        if (!ok) {
+            QMessageBox::warning(this, "Invalid Address", "Please enter a valid hexadecimal address.");
+            return;
+        }
+    }
+    
+    // Check if breakpoint already exists at this address
+    std::vector<Breakpoint> breakpoints = debugger_engine->get_breakpoints();
+    bool breakpoint_exists = false;
+    
+    for (const auto& bp : breakpoints) {
+        if (bp.address == address) {
+            breakpoint_exists = true;
+            break;
+        }
+    }
+    
+    if (breakpoint_exists) {
+        // Remove breakpoint
+        log_message(QString("Removing breakpoint at 0x%1").arg(address, 0, 16));
+        if (debugger_engine->remove_breakpoint(address)) {
+            log_message("Breakpoint removed successfully");
+        } else {
+            log_message("ERROR: Failed to remove breakpoint");
+            QMessageBox::critical(this, "Breakpoint Error", 
+                                "Failed to remove breakpoint: " + 
+                                QString::fromStdString(debugger_engine->get_last_error()));
+        }
+    } else {
+        // Add breakpoint
+        log_message(QString("Adding breakpoint at 0x%1").arg(address, 0, 16));
+        if (debugger_engine->add_breakpoint(address)) {
+            log_message("Breakpoint added successfully");
+        } else {
+            log_message("ERROR: Failed to add breakpoint");
+            QMessageBox::critical(this, "Breakpoint Error", 
+                                "Failed to add breakpoint: " + 
+                                QString::fromStdString(debugger_engine->get_last_error()));
+        }
+    }
+    
+    // Update breakpoint view
+    breakpoint_view->set_breakpoints(debugger_engine->get_breakpoints());
 }
 
 void MainWindow::on_action_analyze_functions_triggered() {
@@ -636,19 +931,204 @@ void MainWindow::on_action_analyze_functions_triggered() {
 }
 
 void MainWindow::on_action_show_strings_triggered() {
-    log_message("Show strings requested (not implemented yet)");
+    if (!elf_parser->is_valid_elf()) {
+        QMessageBox::warning(this, "No File", "Please load a binary file first.");
+        return;
+    }
+    
+    log_message("Extracting strings from binary...");
+    
+    // Extract strings from different sections
+    QString strings_content = "=== STRINGS ANALYSIS ===\n\n";
+    
+    // Get strings from code section
+    std::vector<uint8_t> code_data = elf_parser->get_code_section_data();
+    if (!code_data.empty()) {
+        std::vector<std::string> code_strings = disassembler->extract_strings(code_data.data(), code_data.size());
+        
+        strings_content += QString("Code Section Strings (%1 found):\n").arg(code_strings.size());
+        strings_content += "-----------------------------------\n";
+        
+        for (size_t i = 0; i < code_strings.size(); ++i) {
+            strings_content += QString("[%1] %2\n").arg(i + 1).arg(QString::fromStdString(code_strings[i]));
+        }
+        strings_content += "\n";
+    }
+    
+    // Get strings from data sections
+    std::vector<Section> sections = elf_parser->get_sections();
+    for (const auto& section : sections) {
+        if (section.name == ".rodata" || section.name == ".data" || section.name == ".bss") {
+            if (!section.data.empty()) {
+                std::vector<std::string> section_strings = disassembler->extract_strings(
+                    section.data.data(), section.data.size());
+                
+                if (!section_strings.empty()) {
+                    strings_content += QString("%1 Section Strings (%2 found):\n")
+                                     .arg(QString::fromStdString(section.name))
+                                     .arg(section_strings.size());
+                    strings_content += "-----------------------------------\n";
+                    
+                    for (size_t i = 0; i < section_strings.size(); ++i) {
+                        strings_content += QString("[%1] %2\n").arg(i + 1).arg(QString::fromStdString(section_strings[i]));
+                    }
+                    strings_content += "\n";
+                }
+            }
+        }
+    }
+    
+    // Update the strings view
+    strings_view->setPlainText(strings_content);
+    
+    // Switch to the strings tab
+    QTabWidget* left_tabs = dynamic_cast<QTabWidget*>(strings_view->parent());
+    if (left_tabs) {
+        left_tabs->setCurrentWidget(strings_view);
+    }
+    
+    log_message("String extraction completed");
 }
 
 void MainWindow::on_action_show_imports_triggered() {
-    log_message("Show imports requested (not implemented yet)");
+    if (!elf_parser->is_valid_elf()) {
+        QMessageBox::warning(this, "No File", "Please load a binary file first.");
+        return;
+    }
+    
+    log_message("Analyzing imports...");
+    
+    std::vector<Import> imports = elf_parser->get_imports();
+    
+    QString imports_content = "=== IMPORTS ANALYSIS ===\n\n";
+    imports_content += QString("Total imports found: %1\n\n").arg(imports.size());
+    
+    if (imports.empty()) {
+        imports_content += "No imports found in this binary.\n";
+    } else {
+        imports_content += "Library\t\tFunction\t\tAddress\t\tType\n";
+        imports_content += "================================================================\n";
+        
+        for (const auto& import : imports) {
+            imports_content += QString("%1\t\t%2\t\t0x%3\t\t%4\n")
+                             .arg(QString::fromStdString(import.library), -15)
+                             .arg(QString::fromStdString(import.name), -20)
+                             .arg(import.address, 8, 16, QChar('0'))
+                             .arg(QString::fromStdString(import.type));
+        }
+    }
+    
+    // Create a new dialog to show imports
+    QDialog* imports_dialog = new QDialog(this);
+    imports_dialog->setWindowTitle("Imports Analysis");
+    imports_dialog->setModal(false);
+    imports_dialog->resize(800, 600);
+    
+    QVBoxLayout* layout = new QVBoxLayout(imports_dialog);
+    QTextEdit* imports_text = new QTextEdit();
+    imports_text->setPlainText(imports_content);
+    imports_text->setReadOnly(true);
+    imports_text->setFont(QFont("Consolas", 10));
+    
+    layout->addWidget(imports_text);
+    
+    QPushButton* close_button = new QPushButton("Close");
+    connect(close_button, &QPushButton::clicked, imports_dialog, &QDialog::close);
+    layout->addWidget(close_button);
+    
+    imports_dialog->show();
+    
+    log_message(QString("Imports analysis completed - %1 imports found").arg(imports.size()));
 }
 
 void MainWindow::on_action_show_exports_triggered() {
-    log_message("Show exports requested (not implemented yet)");
+    if (!elf_parser->is_valid_elf()) {
+        QMessageBox::warning(this, "No File", "Please load a binary file first.");
+        return;
+    }
+    
+    log_message("Analyzing exports...");
+    
+    std::vector<Export> exports = elf_parser->get_exports();
+    
+    QString exports_content = "=== EXPORTS ANALYSIS ===\n\n";
+    exports_content += QString("Total exports found: %1\n\n").arg(exports.size());
+    
+    if (exports.empty()) {
+        exports_content += "No exports found in this binary.\n";
+        exports_content += "This might be an executable rather than a shared library.\n";
+    } else {
+        exports_content += "Function\t\t\t\tAddress\t\tType\n";
+        exports_content += "================================================================\n";
+        
+        for (const auto& export_item : exports) {
+            exports_content += QString("%1\t\t\t\t0x%2\t\t%3\n")
+                             .arg(QString::fromStdString(export_item.name), -30)
+                             .arg(export_item.address, 8, 16, QChar('0'))
+                             .arg(QString::fromStdString(export_item.type));
+        }
+    }
+    
+    // Create a new dialog to show exports
+    QDialog* exports_dialog = new QDialog(this);
+    exports_dialog->setWindowTitle("Exports Analysis");
+    exports_dialog->setModal(false);
+    exports_dialog->resize(800, 600);
+    
+    QVBoxLayout* layout = new QVBoxLayout(exports_dialog);
+    QTextEdit* exports_text = new QTextEdit();
+    exports_text->setPlainText(exports_content);
+    exports_text->setReadOnly(true);
+    exports_text->setFont(QFont("Consolas", 10));
+    
+    layout->addWidget(exports_text);
+    
+    QPushButton* close_button = new QPushButton("Close");
+    connect(close_button, &QPushButton::clicked, exports_dialog, &QDialog::close);
+    layout->addWidget(close_button);
+    
+    exports_dialog->show();
+    
+    log_message(QString("Exports analysis completed - %1 exports found").arg(exports.size()));
 }
 
 void MainWindow::update_debug_state() {
-    // Update debug state display
+    // Get current debugger state
+    DebuggerState state = debugger_engine->get_state();
+    current_debug_state = state;
+    
+    // Update status bar
+    switch (state) {
+        case DebuggerState::NOT_RUNNING:
+            debug_state_label->setText("Not Running");
+            break;
+        case DebuggerState::RUNNING:
+            debug_state_label->setText("Running");
+            break;
+        case DebuggerState::PAUSED:
+            debug_state_label->setText("Paused");
+            break;
+        case DebuggerState::STOPPED:
+            debug_state_label->setText("Stopped");
+            break;
+        case DebuggerState::ERROR:
+            debug_state_label->setText("Error");
+            break;
+    }
+    
+    // Update debug controls
+    update_debug_controls();
+    
+    // If paused, update views
+    if (state == DebuggerState::PAUSED) {
+        refresh_views();
+        
+        // Update current instruction pointer
+        current_address = debugger_engine->get_instruction_pointer();
+        highlight_current_instruction(current_address);
+        
+        log_message(QString("Debug state updated - current address: 0x%1").arg(current_address, 0, 16));
+    }
 }
 
 void MainWindow::on_breakpoint_hit(uint64_t address) {
@@ -664,7 +1144,38 @@ void MainWindow::on_address_double_clicked(uint64_t address) {
 }
 
 void MainWindow::refresh_views() {
-    // Refresh dynamic content
+    // Only refresh if we're in a debug session
+    if (current_debug_state != DebuggerState::PAUSED) {
+        return;
+    }
+    
+    try {
+        // Update registers view
+        std::vector<Register> registers = debugger_engine->get_registers();
+        registers_view->set_registers(registers);
+        
+        // Update memory view - show memory around current instruction pointer
+        uint64_t ip = debugger_engine->get_instruction_pointer();
+        if (ip != 0) {
+            // Read 512 bytes around the current instruction pointer
+            uint64_t start_addr = (ip >= 256) ? ip - 256 : 0;
+            std::vector<uint8_t> memory = debugger_engine->read_memory(start_addr, 512);
+            if (!memory.empty()) {
+                memory_view->set_memory_data(start_addr, memory);
+            }
+        }
+        
+        // Update breakpoints view
+        std::vector<Breakpoint> breakpoints = debugger_engine->get_breakpoints();
+        breakpoint_view->set_breakpoints(breakpoints);
+        
+        log_message("Views refreshed");
+        
+    } catch (const std::exception& e) {
+        log_message(QString("Error refreshing views: %1").arg(e.what()));
+    } catch (...) {
+        log_message("Unknown error occurred while refreshing views");
+    }
 }
 
 void MainWindow::update_title() {
