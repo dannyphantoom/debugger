@@ -1,0 +1,9 @@
+/home/danny/projects/debugger/build/CMakeFiles/debugger.dir
+/home/danny/projects/debugger/build/CMakeFiles/edit_cache.dir
+/home/danny/projects/debugger/build/CMakeFiles/rebuild_cache.dir
+/home/danny/projects/debugger/build/CMakeFiles/list_install_components.dir
+/home/danny/projects/debugger/build/CMakeFiles/install.dir
+/home/danny/projects/debugger/build/CMakeFiles/install/local.dir
+/home/danny/projects/debugger/build/CMakeFiles/install/strip.dir
+/home/danny/projects/debugger/build/CMakeFiles/debugger_autogen_timestamp_deps.dir
+/home/danny/projects/debugger/build/CMakeFiles/debugger_autogen.dir
