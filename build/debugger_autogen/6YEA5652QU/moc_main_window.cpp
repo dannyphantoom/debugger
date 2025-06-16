@@ -21,6 +21,356 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_debugger__DisassemblyView_t {
+    QByteArrayData data[1];
+    char stringdata0[26];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_debugger__DisassemblyView_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_debugger__DisassemblyView_t qt_meta_stringdata_debugger__DisassemblyView = {
+    {
+QT_MOC_LITERAL(0, 0, 25) // "debugger::DisassemblyView"
+
+    },
+    "debugger::DisassemblyView"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_debugger__DisassemblyView[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void debugger::DisassemblyView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject debugger::DisassemblyView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QTextEdit::staticMetaObject>(),
+    qt_meta_stringdata_debugger__DisassemblyView.data,
+    qt_meta_data_debugger__DisassemblyView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *debugger::DisassemblyView::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *debugger::DisassemblyView::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_debugger__DisassemblyView.stringdata0))
+        return static_cast<void*>(this);
+    return QTextEdit::qt_metacast(_clname);
+}
+
+int debugger::DisassemblyView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QTextEdit::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_debugger__DecompilerView_t {
+    QByteArrayData data[1];
+    char stringdata0[25];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_debugger__DecompilerView_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_debugger__DecompilerView_t qt_meta_stringdata_debugger__DecompilerView = {
+    {
+QT_MOC_LITERAL(0, 0, 24) // "debugger::DecompilerView"
+
+    },
+    "debugger::DecompilerView"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_debugger__DecompilerView[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void debugger::DecompilerView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject debugger::DecompilerView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QTextEdit::staticMetaObject>(),
+    qt_meta_stringdata_debugger__DecompilerView.data,
+    qt_meta_data_debugger__DecompilerView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *debugger::DecompilerView::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *debugger::DecompilerView::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_debugger__DecompilerView.stringdata0))
+        return static_cast<void*>(this);
+    return QTextEdit::qt_metacast(_clname);
+}
+
+int debugger::DecompilerView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QTextEdit::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_debugger__MemoryView_t {
+    QByteArrayData data[1];
+    char stringdata0[21];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_debugger__MemoryView_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_debugger__MemoryView_t qt_meta_stringdata_debugger__MemoryView = {
+    {
+QT_MOC_LITERAL(0, 0, 20) // "debugger::MemoryView"
+
+    },
+    "debugger::MemoryView"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_debugger__MemoryView[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void debugger::MemoryView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject debugger::MemoryView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QTableWidget::staticMetaObject>(),
+    qt_meta_stringdata_debugger__MemoryView.data,
+    qt_meta_data_debugger__MemoryView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *debugger::MemoryView::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *debugger::MemoryView::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_debugger__MemoryView.stringdata0))
+        return static_cast<void*>(this);
+    return QTableWidget::qt_metacast(_clname);
+}
+
+int debugger::MemoryView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QTableWidget::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_debugger__RegistersView_t {
+    QByteArrayData data[1];
+    char stringdata0[24];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_debugger__RegistersView_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_debugger__RegistersView_t qt_meta_stringdata_debugger__RegistersView = {
+    {
+QT_MOC_LITERAL(0, 0, 23) // "debugger::RegistersView"
+
+    },
+    "debugger::RegistersView"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_debugger__RegistersView[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void debugger::RegistersView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject debugger::RegistersView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QTableWidget::staticMetaObject>(),
+    qt_meta_stringdata_debugger__RegistersView.data,
+    qt_meta_data_debugger__RegistersView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *debugger::RegistersView::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *debugger::RegistersView::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_debugger__RegistersView.stringdata0))
+        return static_cast<void*>(this);
+    return QTableWidget::qt_metacast(_clname);
+}
+
+int debugger::RegistersView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QTableWidget::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_debugger__BreakpointView_t {
+    QByteArrayData data[1];
+    char stringdata0[25];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_debugger__BreakpointView_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_debugger__BreakpointView_t qt_meta_stringdata_debugger__BreakpointView = {
+    {
+QT_MOC_LITERAL(0, 0, 24) // "debugger::BreakpointView"
+
+    },
+    "debugger::BreakpointView"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_debugger__BreakpointView[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void debugger::BreakpointView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject debugger::BreakpointView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QTableWidget::staticMetaObject>(),
+    qt_meta_stringdata_debugger__BreakpointView.data,
+    qt_meta_data_debugger__BreakpointView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *debugger::BreakpointView::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *debugger::BreakpointView::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_debugger__BreakpointView.stringdata0))
+        return static_cast<void*>(this);
+    return QTableWidget::qt_metacast(_clname);
+}
+
+int debugger::BreakpointView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QTableWidget::qt_metacall(_c, _id, _a);
+    return _id;
+}
 struct qt_meta_stringdata_debugger__MainWindow_t {
     QByteArrayData data[28];
     char stringdata0[709];
@@ -101,25 +451,25 @@ static const uint qt_meta_data_debugger__MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  134,    2, 0x0a /* Public */,
-       3,    0,  135,    2, 0x0a /* Public */,
-       4,    0,  136,    2, 0x0a /* Public */,
-       5,    0,  137,    2, 0x0a /* Public */,
-       6,    0,  138,    2, 0x0a /* Public */,
-       7,    0,  139,    2, 0x0a /* Public */,
-       8,    0,  140,    2, 0x0a /* Public */,
-       9,    0,  141,    2, 0x0a /* Public */,
-      10,    0,  142,    2, 0x0a /* Public */,
-      11,    0,  143,    2, 0x0a /* Public */,
-      12,    0,  144,    2, 0x0a /* Public */,
-      13,    0,  145,    2, 0x0a /* Public */,
-      14,    0,  146,    2, 0x0a /* Public */,
-      15,    0,  147,    2, 0x0a /* Public */,
-      16,    0,  148,    2, 0x0a /* Public */,
-      17,    0,  149,    2, 0x0a /* Public */,
-      18,    0,  150,    2, 0x0a /* Public */,
-      19,    0,  151,    2, 0x0a /* Public */,
-      20,    0,  152,    2, 0x0a /* Public */,
+       1,    0,  134,    2, 0x08 /* Private */,
+       3,    0,  135,    2, 0x08 /* Private */,
+       4,    0,  136,    2, 0x08 /* Private */,
+       5,    0,  137,    2, 0x08 /* Private */,
+       6,    0,  138,    2, 0x08 /* Private */,
+       7,    0,  139,    2, 0x08 /* Private */,
+       8,    0,  140,    2, 0x08 /* Private */,
+       9,    0,  141,    2, 0x08 /* Private */,
+      10,    0,  142,    2, 0x08 /* Private */,
+      11,    0,  143,    2, 0x08 /* Private */,
+      12,    0,  144,    2, 0x08 /* Private */,
+      13,    0,  145,    2, 0x08 /* Private */,
+      14,    0,  146,    2, 0x08 /* Private */,
+      15,    0,  147,    2, 0x08 /* Private */,
+      16,    0,  148,    2, 0x08 /* Private */,
+      17,    0,  149,    2, 0x08 /* Private */,
+      18,    0,  150,    2, 0x08 /* Private */,
+      19,    0,  151,    2, 0x08 /* Private */,
+      20,    0,  152,    2, 0x08 /* Private */,
       21,    0,  153,    2, 0x08 /* Private */,
       22,    1,  154,    2, 0x08 /* Private */,
       25,    1,  157,    2, 0x08 /* Private */,

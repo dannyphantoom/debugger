@@ -122,6 +122,8 @@ private:
     void parse_symbols();
     void parse_imports_exports();
     void cache_elf_info();
+    void parse_program_headers();
+    void read_code_segment(uint64_t file_offset, uint64_t vaddr, uint64_t size);
     std::string get_section_type_string(uint32_t type) const;
     std::string get_section_flags_string(uint64_t flags) const;
     std::string get_symbol_type_string(unsigned char type) const;

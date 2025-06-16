@@ -39,127 +39,294 @@ MainWindow::MainWindow(QWidget* parent)
     setup_status_bar();
     connect_signals();
     
-    // Initialize refresh timer
-    refresh_timer = new QTimer(this);
-    refresh_timer->setSingleShot(false);
-    refresh_timer->setInterval(100); // 100ms refresh rate
-    connect(refresh_timer, &QTimer::timeout, this, &MainWindow::refresh_views);
+    // Initialize refresh functionality (timer removed for simplicity)
     
     // Load settings
     load_settings();
     
     // Set window properties
     setWindowTitle("Advanced Debugger v1.0.0");
-    setMinimumSize(800, 600);
-    resize(1200, 800);
+    setMinimumSize(1000, 700);
+    resize(1400, 900);
+    
+    // Apply dark theme
+    apply_dark_theme();
 }
 
 MainWindow::~MainWindow() {
     save_settings();
 }
 
+void MainWindow::apply_dark_theme() {
+    // Dark theme stylesheet
+    QString darkStyle = R"(
+        QMainWindow {
+            background-color: #2b2b2b;
+            color: #ffffff;
+        }
+        
+        QMenuBar {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border-bottom: 1px solid #555555;
+        }
+        
+        QMenuBar::item {
+            background-color: transparent;
+            padding: 4px 8px;
+        }
+        
+        QMenuBar::item:selected {
+            background-color: #4a90e2;
+        }
+        
+        QMenu {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border: 1px solid #555555;
+        }
+        
+        QMenu::item {
+            padding: 4px 16px;
+        }
+        
+        QMenu::item:selected {
+            background-color: #4a90e2;
+        }
+        
+        QTextEdit {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #555555;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+            selection-background-color: #264f78;
+        }
+        
+        QTreeWidget {
+            background-color: #252526;
+            color: #cccccc;
+            border: 1px solid #555555;
+            alternate-background-color: #2d2d30;
+        }
+        
+        QTreeWidget::item {
+            padding: 4px;
+            border-bottom: 1px solid #404040;
+        }
+        
+        QTreeWidget::item:selected {
+            background-color: #0e639c;
+        }
+        
+        QTreeWidget::item:hover {
+            background-color: #383838;
+        }
+        
+        QTableWidget {
+            background-color: #252526;
+            color: #cccccc;
+            border: 1px solid #555555;
+            gridline-color: #404040;
+        }
+        
+        QTableWidget::item {
+            padding: 4px;
+            border-bottom: 1px solid #404040;
+        }
+        
+        QTableWidget::item:selected {
+            background-color: #0e639c;
+        }
+        
+        QHeaderView::section {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border: 1px solid #555555;
+            padding: 4px;
+        }
+        
+        QTabWidget::pane {
+            border: 1px solid #555555;
+            background-color: #2b2b2b;
+        }
+        
+        QTabBar::tab {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            padding: 6px 12px;
+            margin-right: 2px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        
+        QTabBar::tab:selected {
+            background-color: #4a90e2;
+        }
+        
+        QTabBar::tab:hover {
+            background-color: #505050;
+        }
+        
+        QSplitter::handle {
+            background-color: #555555;
+        }
+        
+        QSplitter::handle:horizontal {
+            width: 3px;
+        }
+        
+        QSplitter::handle:vertical {
+            height: 3px;
+        }
+        
+        QLabel {
+            color: #ffffff;
+        }
+        
+        QStatusBar {
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border-top: 1px solid #555555;
+        }
+        
+        /* Scrollbars */
+        QScrollBar:vertical {
+            background-color: #2b2b2b;
+            width: 12px;
+            border-radius: 6px;
+        }
+        
+        QScrollBar::handle:vertical {
+            background-color: #555555;
+            border-radius: 6px;
+            min-height: 20px;
+        }
+        
+        QScrollBar::handle:vertical:hover {
+            background-color: #777777;
+        }
+        
+        QScrollBar:horizontal {
+            background-color: #2b2b2b;
+            height: 12px;
+            border-radius: 6px;
+        }
+        
+        QScrollBar::handle:horizontal {
+            background-color: #555555;
+            border-radius: 6px;
+            min-width: 20px;
+        }
+        
+        QScrollBar::handle:horizontal:hover {
+            background-color: #777777;
+        }
+        
+        QScrollBar::add-line, QScrollBar::sub-line {
+            background-color: transparent;
+        }
+    )";
+    
+    setStyleSheet(darkStyle);
+}
+
 void MainWindow::setup_ui() {
-    // Create central widget and main splitter
     QWidget* central_widget = new QWidget(this);
     setCentralWidget(central_widget);
     
     QVBoxLayout* main_layout = new QVBoxLayout(central_widget);
     main_layout->setContentsMargins(5, 5, 5, 5);
-    
-    // Create simple text edit for now
-    QTextEdit* text_edit = new QTextEdit(this);
-    text_edit->setPlainText("Advanced Debugger v1.0.0\n\nLoad an ELF file to begin analysis.\n\nFeatures:\n- Multi-architecture disassembly\n- Basic decompilation\n- Debug capabilities\n\nUse File -> Open to load a binary file.");
-    text_edit->setReadOnly(true);
-    main_layout->addWidget(text_edit);
-    
-    // Create debug control toolbar
-    QHBoxLayout* control_layout = new QHBoxLayout();
-    continue_button = new QPushButton("Continue (F5)", this);
-    pause_button = new QPushButton("Pause", this);
-    step_into_button = new QPushButton("Step Into (F11)", this);
-    step_over_button = new QPushButton("Step Over (F10)", this);
-    step_out_button = new QPushButton("Step Out (Shift+F11)", this);
-    
-    control_layout->addWidget(continue_button);
-    control_layout->addWidget(pause_button);
-    control_layout->addWidget(step_into_button);
-    control_layout->addWidget(step_over_button);
-    control_layout->addWidget(step_out_button);
-    control_layout->addStretch();
-    
-    main_layout->addLayout(control_layout);
+    main_layout->setSpacing(5);
     
     // Create main horizontal splitter
-    main_splitter = new QSplitter(Qt::Horizontal, this);
+    QSplitter* main_splitter = new QSplitter(Qt::Horizontal, this);
     main_layout->addWidget(main_splitter);
     
-    // Left panel - Analysis trees
-    left_tabs = new QTabWidget(this);
-    left_tabs->setMaximumWidth(300);
+    // Left panel - File analysis
+    setup_left_panel(main_splitter);
     
-    functions_tree = new QTreeWidget(this);
+    // Center panel - Disassembly and decompiler
+    setup_center_panel(main_splitter);
+    
+    // Right panel - Debug info
+    setup_right_panel(main_splitter);
+    
+    // Set splitter proportions
+    main_splitter->setSizes({300, 800, 350});
+    
+    // Status bar
+    setup_status_bar();
+}
+
+void MainWindow::setup_left_panel(QSplitter* parent) {
+    QTabWidget* left_tabs = new QTabWidget();
+    
+    // Functions tree
+    functions_tree = new QTreeWidget();
     functions_tree->setHeaderLabel("Functions");
+    functions_tree->setAlternatingRowColors(true);
     left_tabs->addTab(functions_tree, "Functions");
     
-    symbols_tree = new QTreeWidget(this);
+    // Symbols tree  
+    symbols_tree = new QTreeWidget();
     symbols_tree->setHeaderLabel("Symbols");
+    symbols_tree->setAlternatingRowColors(true);
     left_tabs->addTab(symbols_tree, "Symbols");
     
-    sections_table = new QTableWidget(this);
+    // Sections table
+    sections_table = new QTableWidget();
     sections_table->setColumnCount(4);
     sections_table->setHorizontalHeaderLabels({"Name", "Address", "Size", "Type"});
+    sections_table->horizontalHeader()->setStretchLastSection(true);
+    sections_table->setAlternatingRowColors(true);
+    sections_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     left_tabs->addTab(sections_table, "Sections");
     
-    imports_table = new QTableWidget(this);
-    imports_table->setColumnCount(3);
-    imports_table->setHorizontalHeaderLabels({"Name", "Address", "Type"});
-    left_tabs->addTab(imports_table, "Imports");
-    
-    exports_table = new QTableWidget(this);
-    exports_table->setColumnCount(3);
-    exports_table->setHorizontalHeaderLabels({"Name", "Address", "Type"});
-    left_tabs->addTab(exports_table, "Exports");
-    
-    strings_view = new QTextEdit(this);
+    // Strings view
+    strings_view = new QTextEdit();
     strings_view->setReadOnly(true);
     left_tabs->addTab(strings_view, "Strings");
     
-    main_splitter->addWidget(left_tabs);
+    parent->addWidget(left_tabs);
+}
+
+void MainWindow::setup_center_panel(QSplitter* parent) {
+    QTabWidget* center_tabs = new QTabWidget();
     
-    // Center panel - Disassembly and decompiler
-    center_tabs = new QTabWidget(this);
-    
-    disassembly_view = new DisassemblyView(this);
+    // Disassembly view
+    disassembly_view = new DisassemblyView();
     center_tabs->addTab(disassembly_view, "Disassembly");
     
-    decompiler_view = new DecompilerView(this);
+    // Decompiler view
+    decompiler_view = new DecompilerView();
     center_tabs->addTab(decompiler_view, "Decompiler");
     
-    main_splitter->addWidget(center_tabs);
+    parent->addWidget(center_tabs);
+}
+
+void MainWindow::setup_right_panel(QSplitter* parent) {
+    QTabWidget* right_tabs = new QTabWidget();
     
-    // Right panel - Debug info
-    right_tabs = new QTabWidget(this);
-    right_tabs->setMaximumWidth(400);
-    
-    registers_view = new RegistersView(this);
+    // Registers view
+    registers_view = new RegistersView();
     right_tabs->addTab(registers_view, "Registers");
     
-    memory_view = new MemoryView(this);
+    // Memory view
+    memory_view = new MemoryView();
     right_tabs->addTab(memory_view, "Memory");
     
-    breakpoint_view = new BreakpointView(this);
+    // Breakpoints view
+    breakpoint_view = new BreakpointView();
     right_tabs->addTab(breakpoint_view, "Breakpoints");
     
-    log_view = new QTextEdit(this);
+    // Log view
+    log_view = new QTextEdit();
     log_view->setReadOnly(true);
+    // Note: QTextEdit doesn't have setMaximumBlockCount, this was a mistake
     right_tabs->addTab(log_view, "Log");
     
-    main_splitter->addWidget(right_tabs);
-    
-    // Set splitter proportions
-    main_splitter->setSizes({250, 800, 350});
-    
-    update_debug_controls();
+    parent->addWidget(right_tabs);
 }
 
 void MainWindow::setup_menus() {
@@ -184,9 +351,23 @@ void MainWindow::setup_menus() {
     
     // Debug menu
     QMenu* debug_menu = menu_bar->addMenu("&Debug");
-    
-    QAction* start_action = debug_menu->addAction("&Start Debugging");
+    QAction* start_action = debug_menu->addAction("&Start Debugging (F5)");
+    start_action->setShortcut(QKeySequence("F5"));
     connect(start_action, &QAction::triggered, this, &MainWindow::on_action_start_debug_triggered);
+    
+    QAction* step_into_action = debug_menu->addAction("Step &Into (F11)");
+    step_into_action->setShortcut(QKeySequence("F11"));
+    connect(step_into_action, &QAction::triggered, this, &MainWindow::on_action_step_into_triggered);
+    
+    QAction* step_over_action = debug_menu->addAction("Step &Over (F10)");
+    step_over_action->setShortcut(QKeySequence("F10"));
+    connect(step_over_action, &QAction::triggered, this, &MainWindow::on_action_step_over_triggered);
+    
+    // Tools menu
+    QMenu* tools_menu = menu_bar->addMenu("&Tools");
+    
+    QAction* analyze_action = tools_menu->addAction("&Analyze Functions");
+    connect(analyze_action, &QAction::triggered, this, &MainWindow::on_action_analyze_functions_triggered);
     
     // Help menu
     QMenu* help_menu = menu_bar->addMenu("&Help");
@@ -205,9 +386,9 @@ void MainWindow::setup_toolbars() {
 }
 
 void MainWindow::setup_status_bar() {
-    status_label = new QLabel("Ready", this);
-    architecture_label = new QLabel("", this);
-    debug_state_label = new QLabel("Not Running", this);
+    status_label = new QLabel("Ready");
+    architecture_label = new QLabel("");
+    debug_state_label = new QLabel("Not Running");
     
     statusBar()->addWidget(status_label);
     statusBar()->addPermanentWidget(architecture_label);
@@ -263,8 +444,6 @@ bool MainWindow::open_file(const QString& filename) {
     populate_sections_table();
     populate_functions_tree();
     populate_symbols_tree();
-    populate_imports_table();
-    populate_exports_table();
     populate_strings_view();
     
     // Disassemble and display code section
@@ -292,8 +471,6 @@ void MainWindow::close_file() {
     functions_tree->clear();
     symbols_tree->clear();
     sections_table->setRowCount(0);
-    imports_table->setRowCount(0);
-    exports_table->setRowCount(0);
     strings_view->clear();
     
     update_title();
@@ -304,7 +481,8 @@ void MainWindow::close_file() {
 
 void MainWindow::on_action_open_triggered() {
     QString filename = QFileDialog::getOpenFileName(this,
-        "Open Binary File", QDir::homePath(), "All Files (*)");
+        "Open Binary File", QDir::homePath(), 
+        "Executable Files (*);;ELF Files (*.elf);;All Files (*)");
     
     if (!filename.isEmpty()) {
         open_file(filename);
@@ -321,14 +499,43 @@ void MainWindow::on_action_exit_triggered() {
 
 void MainWindow::on_action_about_triggered() {
     QMessageBox::about(this, "About Advanced Debugger",
-        "Advanced Debugger v1.0.0\n\n"
-        "A comprehensive GUI-based debugger with disassembly, "
-        "decompilation, and debugging capabilities.\n\n"
-        "Built with Qt5, Capstone Engine, and ELFIO.");
+        "<h3>Advanced Debugger v1.0.0</h3>"
+        "<p>A comprehensive GUI-based debugger with disassembly, "
+        "decompilation, and debugging capabilities.</p>"
+        "<p><b>Features:</b></p>"
+        "<ul>"
+        "<li>Multi-architecture disassembly (x86, x86-64, ARM)</li>"
+        "<li>ELF binary analysis and parsing</li>"
+        "<li>Basic decompilation to C-like pseudocode</li>"
+        "<li>Process debugging with breakpoints</li>"
+        "<li>Memory and register inspection</li>"
+        "</ul>"
+        "<p>Built with Qt5, Capstone Engine, and custom ELF parsing.</p>");
 }
 
 void MainWindow::on_action_start_debug_triggered() {
-    QMessageBox::information(this, "Debug", "Debug functionality not fully implemented yet");
+    if (current_filename.isEmpty()) {
+        QMessageBox::warning(this, "No File", "Please load a binary file first.");
+        return;
+    }
+    
+    log_message("Starting debug session...");
+    
+    // Try to load the executable into the debugger
+    if (debugger_engine->load_executable(current_filename.toStdString())) {
+        if (debugger_engine->start_process()) {
+            current_debug_state = DebuggerState::PAUSED;
+            debug_state_label->setText("Paused");
+            log_message("Debug session started successfully");
+            QMessageBox::information(this, "Debug Started", "Debug session started. The process is paused at entry point.");
+        } else {
+            log_message("ERROR: Failed to start debug process");
+            QMessageBox::critical(this, "Debug Error", "Failed to start debug process: " + QString::fromStdString(debugger_engine->get_last_error()));
+        }
+    } else {
+        log_message("ERROR: Failed to load executable");
+        QMessageBox::critical(this, "Debug Error", "Failed to load executable for debugging");
+    }
 }
 
 void MainWindow::on_action_attach_process_triggered() {
@@ -348,11 +555,34 @@ void MainWindow::on_action_stop_triggered() {
 }
 
 void MainWindow::on_action_step_into_triggered() {
-    log_message("Step into requested (not implemented yet)");
+    if (current_debug_state != DebuggerState::PAUSED) {
+        QMessageBox::warning(this, "Not Debugging", "No active debug session. Start debugging first.");
+        return;
+    }
+    
+    log_message("Stepping into...");
+    if (debugger_engine->step_into()) {
+        log_message("Step completed");
+        // Update register and memory views here
+    } else {
+        log_message("ERROR: Step failed");
+        QMessageBox::warning(this, "Step Error", "Failed to step: " + QString::fromStdString(debugger_engine->get_last_error()));
+    }
 }
 
 void MainWindow::on_action_step_over_triggered() {
-    log_message("Step over requested (not implemented yet)");
+    if (current_debug_state != DebuggerState::PAUSED) {
+        QMessageBox::warning(this, "Not Debugging", "No active debug session. Start debugging first.");
+        return;
+    }
+    
+    log_message("Stepping over...");
+    if (debugger_engine->step_over()) {
+        log_message("Step over completed");
+    } else {
+        log_message("ERROR: Step over failed");
+        QMessageBox::warning(this, "Step Error", "Failed to step over: " + QString::fromStdString(debugger_engine->get_last_error()));
+    }
 }
 
 void MainWindow::on_action_step_out_triggered() {
@@ -372,7 +602,37 @@ void MainWindow::on_action_toggle_breakpoint_triggered() {
 }
 
 void MainWindow::on_action_analyze_functions_triggered() {
-    log_message("Function analysis requested (not implemented yet)");
+    if (!elf_parser->is_valid_elf()) {
+        QMessageBox::warning(this, "No File", "Please load a binary file first.");
+        return;
+    }
+    
+    log_message("Analyzing functions...");
+    
+    // Get disassembled instructions
+    std::vector<uint8_t> code_data = elf_parser->get_code_section_data();
+    if (!code_data.empty()) {
+        uint64_t entry_point = elf_parser->get_entry_point();
+        std::vector<Instruction> instructions = disassembler->disassemble(
+            code_data.data(), code_data.size(), entry_point);
+        
+        // Analyze functions
+        std::vector<Function> functions = disassembler->analyze_functions(instructions);
+        
+        log_message(QString("Found %1 functions").arg(functions.size()));
+        
+        // Display results
+        QString result = QString("Function Analysis Results:\n\n");
+        for (const auto& func : functions) {
+            result += QString("Function: %1\n").arg(QString::fromStdString(func.name));
+            result += QString("  Start: 0x%1\n").arg(func.start_address, 0, 16);
+            result += QString("  End: 0x%1\n").arg(func.end_address, 0, 16);
+            result += QString("  Instructions: %1\n\n").arg(func.instructions.size());
+        }
+        
+        // Show in a new dialog or update decompiler view
+        decompiler_view->setPlainText(result);
+    }
 }
 
 void MainWindow::on_action_show_strings_triggered() {
@@ -420,7 +680,7 @@ void MainWindow::update_status() {
         status_label->setText("Ready");
         architecture_label->setText("");
     } else {
-        status_label->setText("File loaded");
+        status_label->setText("File loaded: " + QFileInfo(current_filename).fileName());
         architecture_label->setText(QString::fromStdString(disassembler->get_architecture_name()));
     }
     
@@ -435,7 +695,13 @@ void MainWindow::populate_functions_tree() {
         for (const auto& func : functions) {
             QTreeWidgetItem* item = new QTreeWidgetItem();
             item->setText(0, QString::fromStdString(func.name));
-            item->setText(1, QString("0x%1").arg(func.address, 0, 16));
+            item->setToolTip(0, QString("Address: 0x%1, Size: %2 bytes").arg(func.address, 0, 16).arg(func.size));
+            functions_tree->addTopLevelItem(item);
+        }
+        
+        if (functions.empty()) {
+            QTreeWidgetItem* item = new QTreeWidgetItem();
+            item->setText(0, "No functions found");
             functions_tree->addTopLevelItem(item);
         }
     }
@@ -449,6 +715,7 @@ void MainWindow::populate_symbols_tree() {
         for (const auto& symbol : symbols) {
             QTreeWidgetItem* item = new QTreeWidgetItem();
             item->setText(0, QString::fromStdString(symbol.name));
+            item->setToolTip(0, QString("Type: %1, Address: 0x%2").arg(QString::fromStdString(symbol.type)).arg(symbol.address, 0, 16));
             symbols_tree->addTopLevelItem(item);
         }
     }
@@ -468,38 +735,8 @@ void MainWindow::populate_sections_table() {
             sections_table->setItem(i, 2, new QTableWidgetItem(QString::number(section.size)));
             sections_table->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(section.type)));
         }
-    }
-}
-
-void MainWindow::populate_imports_table() {
-    imports_table->setRowCount(0);
-    
-    if (elf_parser->is_valid_elf()) {
-        std::vector<Import> imports = elf_parser->get_imports();
-        imports_table->setRowCount(imports.size());
         
-        for (size_t i = 0; i < imports.size(); ++i) {
-            const auto& import = imports[i];
-            imports_table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(import.name)));
-            imports_table->setItem(i, 1, new QTableWidgetItem(QString("0x%1").arg(import.address, 0, 16)));
-            imports_table->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(import.type)));
-        }
-    }
-}
-
-void MainWindow::populate_exports_table() {
-    exports_table->setRowCount(0);
-    
-    if (elf_parser->is_valid_elf()) {
-        std::vector<Export> exports = elf_parser->get_exports();
-        exports_table->setRowCount(exports.size());
-        
-        for (size_t i = 0; i < exports.size(); ++i) {
-            const auto& exp = exports[i];
-            exports_table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(exp.name)));
-            exports_table->setItem(i, 1, new QTableWidgetItem(QString("0x%1").arg(exp.address, 0, 16)));
-            exports_table->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(exp.type)));
-        }
+        sections_table->resizeColumnsToContents();
     }
 }
 
@@ -521,7 +758,7 @@ void MainWindow::populate_strings_view() {
 }
 
 void MainWindow::log_message(const QString& message) {
-    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
     log_view->append(QString("[%1] %2").arg(timestamp, message));
 }
 
@@ -575,19 +812,33 @@ void MainWindow::load_settings() {
 
 // Placeholder implementations for custom view classes
 DisassemblyView::DisassemblyView(QWidget* parent) : QTextEdit(parent), highlighted_address(0) {
-    setFont(QFont("Courier", 10));
+    setFont(QFont("Consolas", 10));
     setReadOnly(true);
+    setLineWrapMode(QTextEdit::NoWrap);
 }
 
 void DisassemblyView::set_instructions(const std::vector<Instruction>& instructions) {
     current_instructions = instructions;
     
     QString content;
+    content += QString("Disassembly (%1 instructions):\n\n").arg(instructions.size());
+    
     for (const auto& insn : instructions) {
-        content += QString("0x%1: %2 %3\n")
-                  .arg(insn.address, 8, 16, QChar('0'))
-                  .arg(QString::fromStdString(insn.mnemonic), -8)
-                  .arg(QString::fromStdString(insn.operands));
+        QString line = QString("0x%1:  %2    %3")
+                      .arg(insn.address, 8, 16, QChar('0'))
+                      .arg(QString::fromStdString(insn.mnemonic), -8)
+                      .arg(QString::fromStdString(insn.operands));
+        
+        // Add instruction type indicators
+        if (insn.is_call) {
+            line += "    ; CALL";
+        } else if (insn.is_jump) {
+            line += "    ; JUMP";
+        } else if (insn.is_return) {
+            line += "    ; RETURN";
+        }
+        
+        content += line + "\n";
     }
     
     setPlainText(content);
@@ -613,7 +864,7 @@ void DisassemblyView::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 DecompilerView::DecompilerView(QWidget* parent) : QTextEdit(parent) {
-    setFont(QFont("Courier", 10));
+    setFont(QFont("Consolas", 10));
     setReadOnly(true);
 }
 
@@ -631,8 +882,13 @@ void DecompilerView::setup_syntax_highlighting() {
 
 MemoryView::MemoryView(QWidget* parent) : QTableWidget(parent), base_address(0) {
     setColumnCount(17); // Address + 16 bytes
-    setHorizontalHeaderLabels({"Address", "00", "01", "02", "03", "04", "05", "06", "07",
-                              "08", "09", "0A", "0B", "0C", "0D", "0E", "0F"});
+    QStringList headers;
+    headers << "Address";
+    for (int i = 0; i < 16; ++i) {
+        headers << QString("%1").arg(i, 2, 16, QChar('0')).toUpper();
+    }
+    setHorizontalHeaderLabels(headers);
+    setAlternatingRowColors(true);
 }
 
 void MemoryView::set_memory_data(uint64_t start_address, const std::vector<uint8_t>& data) {
@@ -650,11 +906,14 @@ void MemoryView::update_display() {
 }
 
 RegistersView::RegistersView(QWidget* parent) : QTableWidget(parent) {
-    setup_columns();
+    setColumnCount(3);
+    setHorizontalHeaderLabels({"Register", "Value", "Size"});
+    setAlternatingRowColors(true);
+    horizontalHeader()->setStretchLastSection(true);
 }
 
 void RegistersView::set_registers(const std::vector<Register>& registers) {
-    current_registers = registers;
+    previous_registers = registers;
     // Implementation would display registers
 }
 
@@ -668,7 +927,10 @@ void RegistersView::setup_columns() {
 }
 
 BreakpointView::BreakpointView(QWidget* parent) : QTableWidget(parent) {
-    setup_columns();
+    setColumnCount(4);
+    setHorizontalHeaderLabels({"Address", "Type", "Enabled", "Condition"});
+    setAlternatingRowColors(true);
+    horizontalHeader()->setStretchLastSection(true);
 }
 
 void BreakpointView::set_breakpoints(const std::vector<Breakpoint>& breakpoints) {

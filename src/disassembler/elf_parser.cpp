@@ -16,16 +16,16 @@ bool ElfParser::load_file(const std::string& filename) {
     info_cached = false;
     last_error.clear();
     
-    // Basic file existence check
+    // Open file and read ELF header
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         last_error = "Failed to open file: " + filename;
         return false;
     }
     
-    // Read ELF header (very basic check)
-    char elf_header[16];
-    file.read(elf_header, 16);
+    // Read ELF header (basic validation)
+    char elf_header[64];
+    file.read(elf_header, 64);
     
     if (file.gcount() < 16 || 
         elf_header[0] != 0x7f || elf_header[1] != 'E' || 
@@ -44,39 +44,54 @@ void ElfParser::cache_elf_info() {
     if (!loaded) return;
     
     cached_info.filename = filename;
-    cached_info.architecture = Architecture::X86_64; // Default assumption
-    cached_info.entry_point = 0x401000; // Default entry point
+    
+    // Read ELF header to get basic info
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) return;
+    
+    char header[64];
+    file.read(header, 64);
+    
+    // Check 32-bit vs 64-bit
+    cached_info.is_64bit = (header[4] == 2); // EI_CLASS = ELFCLASS64
+    cached_info.is_little_endian = (header[5] == 1); // EI_DATA = ELFDATA2LSB
+    
+    // Set architecture based on file
+    if (cached_info.is_64bit) {
+        cached_info.architecture = Architecture::X86_64;
+        cached_info.machine_type = "x86-64";
+    } else {
+        cached_info.architecture = Architecture::X86;
+        cached_info.machine_type = "i386";
+    }
+    
+    // Read entry point (different offsets for 32/64-bit)
+    uint64_t entry_offset = cached_info.is_64bit ? 24 : 24;
+    file.seekg(entry_offset);
+    
+    if (cached_info.is_64bit) {
+        uint64_t entry;
+        file.read(reinterpret_cast<char*>(&entry), 8);
+        cached_info.entry_point = cached_info.is_little_endian ? entry : __builtin_bswap64(entry);
+    } else {
+        uint32_t entry;
+        file.read(reinterpret_cast<char*>(&entry), 4);
+        cached_info.entry_point = cached_info.is_little_endian ? entry : __builtin_bswap32(entry);
+    }
     
     std::stringstream ss;
     ss << "0x" << std::hex << cached_info.entry_point;
     cached_info.entry_point_hex = ss.str();
     
-    cached_info.is_64bit = true; // Default assumption
-    cached_info.is_little_endian = true;
     cached_info.file_type = "Executable";
-    cached_info.machine_type = "x86-64";
     
-    // Create dummy sections
-    Section text_section;
-    text_section.name = ".text";
-    text_section.address = 0x401000;
-    text_section.size = 0x1000;
-    text_section.file_offset = 0x1000;
-    text_section.type = "PROGBITS";
-    text_section.flags = "AX";
-    text_section.is_executable = true;
-    text_section.is_writable = false;
-    text_section.is_readable = true;
+    // Read program headers to find text segment
+    parse_program_headers();
     
-    // Add some dummy data
-    text_section.data.resize(0x1000, 0x90); // Fill with NOPs
-    
-    cached_info.sections.push_back(text_section);
-    
-    // Create dummy symbols
+    // Create basic symbol for main
     Symbol main_symbol;
     main_symbol.name = "main";
-    main_symbol.address = 0x401000;
+    main_symbol.address = cached_info.entry_point;
     main_symbol.size = 100;
     main_symbol.type = "FUNC";
     main_symbol.binding = "GLOBAL";
@@ -88,6 +103,131 @@ void ElfParser::cache_elf_info() {
     cached_info.symbols.push_back(main_symbol);
     
     info_cached = true;
+}
+
+void ElfParser::parse_program_headers() {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) return;
+    
+    char header[64];
+    file.read(header, 64);
+    
+    // Get program header table offset and entry size
+    uint64_t ph_offset, ph_size, ph_count;
+    
+    if (cached_info.is_64bit) {
+        ph_offset = *reinterpret_cast<uint64_t*>(&header[32]);
+        ph_size = *reinterpret_cast<uint16_t*>(&header[54]);
+        ph_count = *reinterpret_cast<uint16_t*>(&header[56]);
+        
+        if (!cached_info.is_little_endian) {
+            ph_offset = __builtin_bswap64(ph_offset);
+            ph_size = __builtin_bswap16(ph_size);
+            ph_count = __builtin_bswap16(ph_count);
+        }
+    } else {
+        ph_offset = *reinterpret_cast<uint32_t*>(&header[28]);
+        ph_size = *reinterpret_cast<uint16_t*>(&header[42]);
+        ph_count = *reinterpret_cast<uint16_t*>(&header[44]);
+        
+        if (!cached_info.is_little_endian) {
+            ph_offset = __builtin_bswap32(ph_offset);
+            ph_size = __builtin_bswap16(ph_size);
+            ph_count = __builtin_bswap16(ph_count);
+        }
+    }
+    
+    // Find executable segment (PT_LOAD with PF_X)
+    file.seekg(ph_offset);
+    
+    for (uint16_t i = 0; i < ph_count && i < 16; ++i) { // Limit to reasonable number
+        if (cached_info.is_64bit) {
+            struct {
+                uint32_t p_type;
+                uint32_t p_flags;
+                uint64_t p_offset;
+                uint64_t p_vaddr;
+                uint64_t p_paddr;
+                uint64_t p_filesz;
+                uint64_t p_memsz;
+                uint64_t p_align;
+            } phdr;
+            
+            file.read(reinterpret_cast<char*>(&phdr), sizeof(phdr));
+            
+            if (!cached_info.is_little_endian) {
+                phdr.p_type = __builtin_bswap32(phdr.p_type);
+                phdr.p_flags = __builtin_bswap32(phdr.p_flags);
+                phdr.p_offset = __builtin_bswap64(phdr.p_offset);
+                phdr.p_vaddr = __builtin_bswap64(phdr.p_vaddr);
+                phdr.p_filesz = __builtin_bswap64(phdr.p_filesz);
+            }
+            
+            // PT_LOAD = 1, PF_X = 1
+            if (phdr.p_type == 1 && (phdr.p_flags & 1)) {
+                read_code_segment(phdr.p_offset, phdr.p_vaddr, phdr.p_filesz);
+                break;
+            }
+        } else {
+            struct {
+                uint32_t p_type;
+                uint32_t p_offset;
+                uint32_t p_vaddr;
+                uint32_t p_paddr;
+                uint32_t p_filesz;
+                uint32_t p_memsz;
+                uint32_t p_flags;
+                uint32_t p_align;
+            } phdr;
+            
+            file.read(reinterpret_cast<char*>(&phdr), sizeof(phdr));
+            
+            if (!cached_info.is_little_endian) {
+                phdr.p_type = __builtin_bswap32(phdr.p_type);
+                phdr.p_offset = __builtin_bswap32(phdr.p_offset);
+                phdr.p_vaddr = __builtin_bswap32(phdr.p_vaddr);
+                phdr.p_filesz = __builtin_bswap32(phdr.p_filesz);
+                phdr.p_flags = __builtin_bswap32(phdr.p_flags);
+            }
+            
+            // PT_LOAD = 1, PF_X = 1
+            if (phdr.p_type == 1 && (phdr.p_flags & 1)) {
+                read_code_segment(phdr.p_offset, phdr.p_vaddr, phdr.p_filesz);
+                break;
+            }
+        }
+    }
+}
+
+void ElfParser::read_code_segment(uint64_t file_offset, uint64_t vaddr, uint64_t size) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) return;
+    
+    // Limit size to reasonable amount (1MB max)
+    size = std::min(size, static_cast<uint64_t>(1024 * 1024));
+    
+    file.seekg(file_offset);
+    
+    Section text_section;
+    text_section.name = ".text";
+    text_section.address = vaddr;
+    text_section.size = size;
+    text_section.file_offset = file_offset;
+    text_section.type = "PROGBITS";
+    text_section.flags = "AX";
+    text_section.is_executable = true;
+    text_section.is_writable = false;
+    text_section.is_readable = true;
+    
+    // Read actual binary data
+    text_section.data.resize(size);
+    file.read(reinterpret_cast<char*>(text_section.data.data()), size);
+    
+    // Store the actual read size
+    text_section.data.resize(file.gcount());
+    text_section.size = file.gcount();
+    
+    cached_info.sections.push_back(text_section);
 }
 
 ElfInfo ElfParser::get_elf_info() const {
